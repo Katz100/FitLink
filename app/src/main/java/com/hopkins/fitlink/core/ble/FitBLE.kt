@@ -45,6 +45,9 @@ class FitBLE @Inject constructor(
     private val _devices = MutableStateFlow<Set<BluetoothDevice>>(emptySet())
     val devices: StateFlow<Set<BluetoothDevice>> = _devices.asStateFlow()
 
+    private val _isScanning = MutableStateFlow<Boolean>(false)
+    val isScanning: StateFlow<Boolean> = _isScanning.asStateFlow()
+
     private val leScanCallback: ScanCallback = object : ScanCallback() {
         @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
         override fun onScanResult(callbackType: Int, result: ScanResult) {
@@ -77,23 +80,27 @@ class FitBLE @Inject constructor(
     }
 
     private val bluetoothLeScanner = bluetoothAdapter?.bluetoothLeScanner
-    private var scanning = false
     private val handler = Handler(Looper.getMainLooper())
 
     // Stops scanning after 10 seconds.
     private val SCAN_PERIOD: Long = 10000
 
-    @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
-    fun scanLeDevice() {
-        if (!scanning) { // Stops scanning after a pre-defined scan period.
+    fun scanLeDevice(context: Context) {
+        if (
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.BLUETOOTH_SCAN
+            ) != PackageManager.PERMISSION_GRANTED
+        ) return
+        if (!_isScanning.value) { // Stops scanning after a pre-defined scan period.
             handler.postDelayed({
-                scanning = false
+                _isScanning.value = false
                 bluetoothLeScanner?.stopScan(leScanCallback)
             }, SCAN_PERIOD)
-            scanning = true
+            _isScanning.value = true
             bluetoothLeScanner?.startScan(leScanCallback)
         } else {
-            scanning = false
+            _isScanning.value = false
             bluetoothLeScanner?.stopScan(leScanCallback)
         }
     }

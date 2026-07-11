@@ -87,7 +87,7 @@ fun Dev(
                 Text("BLE Supported?")
             }
             Button(onClick = {
-                fitBLE.scanLeDevice()
+                fitBLE.scanLeDevice(context)
             }) {
                 Text("Start Scan")
             }
