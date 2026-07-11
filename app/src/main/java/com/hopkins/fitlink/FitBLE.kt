@@ -1,15 +1,21 @@
 package com.hopkins.fitlink
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothDevice
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.core.content.ContextCompat
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import timber.log.Timber
 import javax.inject.Inject
 
 class FitBLE @Inject constructor(
@@ -32,10 +38,34 @@ class FitBLE @Inject constructor(
         }
     }
 
+    private val _devices = MutableStateFlow<Set<BluetoothDevice>>(emptySet())
+    val devices: StateFlow<Set<BluetoothDevice>> = _devices.asStateFlow()
+
     private val leScanCallback: ScanCallback = object : ScanCallback() {
+        @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
         override fun onScanResult(callbackType: Int, result: ScanResult) {
             super.onScanResult(callbackType, result)
             val device = result.device
+            val scanRecord = result.scanRecord
+
+            if (!_devices.value.contains(device)) {
+                val supportsFTMS = scanRecord?.serviceUuids?.any { service ->
+                    service.uuid.toString() == FTMSConstants.FTMS_MACHINE
+                } == true
+
+                if (supportsFTMS) {
+                    Timber.tag("FitBLE").d("""
+                    Name: ${device.name ?: scanRecord.deviceName}
+                    Address: ${device.address}
+                    Service UUIDs: ${scanRecord.serviceUuids}
+                    Service Data: ${scanRecord.serviceData}
+                    Manufacturer Data: ${scanRecord.manufacturerSpecificData}
+                    Raw Bytes: ${scanRecord.bytes?.joinToString(" ") { "%02X".format(it) }}
+                """.trimIndent())
+
+                    _devices.value = _devices.value + setOf(device)
+                }
+            }
         }
 
         override fun onScanFailed(errorCode: Int) {
@@ -43,9 +73,10 @@ class FitBLE @Inject constructor(
             Log.i("TAG", "Scanning failed: $errorCode")
         }
     }
+
     private val bluetoothLeScanner = bluetoothAdapter?.bluetoothLeScanner
     private var scanning = false
-    private val handler = Handler()
+    private val handler = Handler(Looper.getMainLooper())
 
     // Stops scanning after 10 seconds.
     private val SCAN_PERIOD: Long = 10000
@@ -67,6 +98,10 @@ class FitBLE @Inject constructor(
 
     fun isBLESupported(): Boolean {
         return bluetoothAdapter?.isEnabled == true
+    }
+
+    fun clearDevices() {
+        _devices.value = emptySet()
     }
 
     @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
