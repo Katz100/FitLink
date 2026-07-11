@@ -61,13 +61,6 @@ class FitBLE @Inject constructor(
                 } == true
 
                 if (supportsFTMS) {
-                    Timber.Forest.tag(TAG).d("""
-                    Name: ${device.name ?: scanRecord.deviceName}
-                    Address: ${device.address}
-                    Service UUIDs: ${scanRecord.serviceUuids}
-                    Service Data: ${scanRecord.serviceData}
-                """.trimIndent())
-
                     _devices.value = _devices.value + setOf(device)
                 }
             }

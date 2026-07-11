@@ -20,4 +20,8 @@ class HomeScreenViewModel @Inject constructor(
     fun scanForDevices(context: Context) {
         fitBLE.scanLeDevice(context)
     }
+
+    fun clearDevices() {
+        fitBLE.clearDevices()
+    }
 }
