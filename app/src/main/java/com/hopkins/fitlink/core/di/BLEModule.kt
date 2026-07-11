@@ -1,4 +1,4 @@
-package com.hopkins.fitlink.di
+package com.hopkins.fitlink.core.di
 
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager

@@ -1,4 +1,5 @@
-package com.hopkins.fitlink
+package com.hopkins.fitlink.core.ble
+
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
@@ -12,6 +13,7 @@ import android.os.Looper
 import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.core.content.ContextCompat
+import com.hopkins.fitlink.core.ble.FTMSConstants
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,6 +24,8 @@ class FitBLE @Inject constructor(
     private val bluetoothAdapter: BluetoothAdapter?
 ) {
     companion object {
+        const val TAG = "FitBLE"
+
         val BLE_PERMISSIONS = setOf(
             Manifest.permission.BLUETOOTH_CONNECT,
             Manifest.permission.BLUETOOTH_SCAN,
@@ -54,13 +58,11 @@ class FitBLE @Inject constructor(
                 } == true
 
                 if (supportsFTMS) {
-                    Timber.tag("FitBLE").d("""
+                    Timber.Forest.tag(TAG).d("""
                     Name: ${device.name ?: scanRecord.deviceName}
                     Address: ${device.address}
                     Service UUIDs: ${scanRecord.serviceUuids}
                     Service Data: ${scanRecord.serviceData}
-                    Manufacturer Data: ${scanRecord.manufacturerSpecificData}
-                    Raw Bytes: ${scanRecord.bytes?.joinToString(" ") { "%02X".format(it) }}
                 """.trimIndent())
 
                     _devices.value = _devices.value + setOf(device)
