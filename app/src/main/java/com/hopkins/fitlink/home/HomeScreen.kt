@@ -2,7 +2,11 @@ package com.hopkins.fitlink.home
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,12 +27,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.hopkins.fitlink.core.ble.FitBLE
 import com.hopkins.fitlink.core.ui.DeviceItem
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,9 +45,21 @@ fun HomeScreen(
     val context = LocalContext.current
     val devices = viewModel.devices.collectAsStateWithLifecycle().value
     val isScanning = viewModel.isScanning.collectAsStateWithLifecycle().value
+    val connectivity = viewModel.connectivity.collectAsStateWithLifecycle().value
 
-    LaunchedEffect(Unit) {
-        viewModel.scanForDevices(context)
+    val bluetoothPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val allGranted = !permissions.values.contains(false)
+        if (allGranted) {
+            Log.i("TAG", "Bluetooth permissions granted")
+        } else {
+            Log.i("TAG", "Bluetooth permissions denied: $permissions")
+        }
+    }
+
+    LaunchedEffect(connectivity) {
+        Toast.makeText(context, "Connectivity: ${connectivity.name}", Toast.LENGTH_SHORT).show()
     }
 
     Scaffold(
@@ -54,7 +72,17 @@ fun HomeScreen(
                 actions = {
                     Button(
                         onClick = {
-                            viewModel.scanForDevices(context)
+                            if(!viewModel.isBleEnabled()) {
+                                if (ContextCompat.checkSelfPermission(
+                                        context, Manifest.permission.BLUETOOTH_CONNECT
+                                ) == PackageManager.PERMISSION_GRANTED) {
+                                    viewModel.enableBle(context)
+                                }
+                            } else if (FitBLE.isBLEPermissionsGranted(context)) {
+                                viewModel.scanForDevices(context)
+                            } else {
+                                bluetoothPermissionLauncher.launch(FitBLE.BLE_PERMISSIONS)
+                            }
                         },
                         enabled = !isScanning,
                         shape = ShapeDefaults.Medium,
@@ -78,18 +106,45 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
+            item {
+                if (devices.isEmpty()) {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "No devices available...",
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        )
+                    }
+                }
+            }
             items(devices.toList(), key = { it.address }) { device ->
-                DeviceItem(
-                    icon = Icons.Default.Settings,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(100.dp)
-                        .padding(16.dp),
-                    deviceName = device.name ?: "N/A",
-                    deviceAddress = device.address,
-                    deviceNameTextStyle = MaterialTheme.typography.titleMedium,
-                    deviceAddressTextStyle = MaterialTheme.typography.bodySmall,
-                )
+                if (ContextCompat.checkSelfPermission(
+                        context, Manifest.permission.BLUETOOTH_SCAN
+                ) == PackageManager.PERMISSION_GRANTED) {
+                    DeviceItem(
+                        icon = Icons.Default.Settings,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(100.dp)
+                            .padding(16.dp),
+                        deviceName = device.name ?: "N/A",
+                        deviceAddress = device.address,
+                        deviceNameTextStyle = MaterialTheme.typography.titleMedium,
+                        deviceAddressTextStyle = MaterialTheme.typography.bodySmall,
+                        onConnectClicked = {
+                            viewModel.connectToDevice(
+                                context = context,
+                                autoConnect = false,
+                                device = device,
+                            )
+                        }
+                    )
+                }
             }
         }
     }

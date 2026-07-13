@@ -1,9 +1,11 @@
 package com.hopkins.fitlink.home
 
+import android.Manifest
 import android.bluetooth.BluetoothDevice
 import android.content.Context
+import androidx.annotation.RequiresPermission
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import com.hopkins.fitlink.core.ble.Connectivity
 import com.hopkins.fitlink.core.ble.FitBLE
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.StateFlow
@@ -16,6 +18,7 @@ class HomeScreenViewModel @Inject constructor(
 
     val devices: StateFlow<Set<BluetoothDevice>> = fitBLE.devices
     val isScanning: StateFlow<Boolean> = fitBLE.isScanning
+    val connectivity: StateFlow<Connectivity> = fitBLE.connectivity
 
     fun scanForDevices(context: Context) {
         fitBLE.scanLeDevice(context)
@@ -23,5 +26,26 @@ class HomeScreenViewModel @Inject constructor(
 
     fun clearDevices() {
         fitBLE.clearDevices()
+    }
+
+    fun isBleEnabled(): Boolean {
+        return fitBLE.isBLESupported()
+    }
+
+    @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
+    fun enableBle(context: Context) {
+        fitBLE.enableBluetooth(context)
+    }
+
+    fun connectToDevice(
+        context: Context,
+        autoConnect: Boolean = true,
+        device: BluetoothDevice,
+    ) {
+        fitBLE.connectToGATT(
+            context = context,
+            device = device,
+            autoConnect = autoConnect
+        )
     }
 }

@@ -28,6 +28,7 @@ fun DeviceItem(
     deviceAddress: String,
     deviceNameTextStyle: TextStyle,
     deviceAddressTextStyle: TextStyle,
+    onConnectClicked: () -> Unit,
 ) {
     Card(
         modifier = modifier
@@ -57,7 +58,7 @@ fun DeviceItem(
             }
             Spacer(modifier = Modifier.weight(1f))
             Button(
-                onClick = {}
+                onClick = onConnectClicked
             ) {
                 Text(
                     text = "CONNECT"
@@ -78,6 +79,7 @@ fun DeviceItemPreview() {
         deviceName = "CTM34232342",
         deviceAddress = "23:23:23:23:23:23",
         deviceNameTextStyle = MaterialTheme.typography.titleMedium,
-        deviceAddressTextStyle = MaterialTheme.typography.bodySmall
+        deviceAddressTextStyle = MaterialTheme.typography.bodySmall,
+        onConnectClicked = {}
     )
 }

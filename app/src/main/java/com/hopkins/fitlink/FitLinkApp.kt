@@ -21,7 +21,7 @@ private class RemoteTree(
     context: Context
 ): Timber.Tree() {
     companion object {
-        const val FILE_NAME = "logs"
+        const val FILE_NAME = "logs2"
     }
 
     private val file = File(context.filesDir, FILE_NAME)
