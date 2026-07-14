@@ -1,7 +1,7 @@
 package com.hopkins.fitlink.core.ble
 
 import android.Manifest
-import android.bluetooth.BluetoothAdapter
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCallback
@@ -11,25 +11,24 @@ import android.bluetooth.BluetoothProfile
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.core.content.ContextCompat
+import com.hopkins.fitlink.core.ftms.FTMSConstants
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import timber.log.Timber
 import java.util.UUID
+import javax.inject.Inject
 
-class FitBLE (
-    private val bluetoothAdapter: BluetoothAdapter?
+@SuppressLint("MissingPermission")
+class FitBLE @Inject constructor(
+    private val fitBluetoothLeScanner: FitBluetoothLeScanner
 ) {
     companion object {
         private const val TAG = "FitBLE"
-        private const val SCAN_PERIOD = 10_000L
 
         val BLE_PERMISSIONS = arrayOf(
             Manifest.permission.BLUETOOTH_CONNECT,
@@ -50,8 +49,7 @@ class FitBLE (
     private val _devices = MutableStateFlow<Set<BluetoothDevice>>(emptySet())
     val devices: StateFlow<Set<BluetoothDevice>> = _devices.asStateFlow()
 
-    private val _isScanning = MutableStateFlow<Boolean>(false)
-    val isScanning: StateFlow<Boolean> = _isScanning.asStateFlow()
+    val isScanning: StateFlow<Boolean> = fitBluetoothLeScanner.scanning.asStateFlow()
 
     private val _connectivity = MutableStateFlow<Connectivity>(Connectivity.DISCONNECTED)
     val connectivity: StateFlow<Connectivity> = _connectivity.asStateFlow()
@@ -68,7 +66,7 @@ class FitBLE (
                     service.uuid.toString() == FTMSConstants.FTMS_MACHINE
                 } == true
 
-                if (supportsFTMS && device != null) {
+                if (!supportsFTMS && device != null) {
                     _devices.value = _devices.value + setOf(device)
                 }
             }
@@ -95,7 +93,9 @@ class FitBLE (
                         Timber.tag(TAG).i("Disconnected")
                         _connectivity.value = Connectivity.DISCONNECTED
                         gatt?.close()
-                        if (gatt == bluetoothGatt) bluetoothGatt = null
+                        if (gatt == fitBluetoothLeScanner.bluetoothGatt) {
+                            fitBluetoothLeScanner.bluetoothGatt = null
+                        }
                     }
                 }
             } else {
@@ -103,7 +103,9 @@ class FitBLE (
                 _connectivity.value = Connectivity.CONNECTION_ERROR
                 gatt?.disconnect()
                 gatt?.close()
-                if (gatt == bluetoothGatt) bluetoothGatt = null
+                if (gatt == fitBluetoothLeScanner.bluetoothGatt) {
+                    fitBluetoothLeScanner.bluetoothGatt = null
+                }
             }
         }
 
@@ -192,7 +194,7 @@ class FitBLE (
         characteristic: BluetoothGattCharacteristic,
         enabled: Boolean
     ) {
-        bluetoothGatt?.let { gatt ->
+        fitBluetoothLeScanner.bluetoothGatt?.let { gatt ->
             gatt.setCharacteristicNotification(characteristic, enabled)
             val ccd = characteristic.getDescriptor(UUID.fromString(FTMSConstants.CLIENT_CHARACTERISTIC_CONFIG))
             ccd.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
@@ -204,55 +206,33 @@ class FitBLE (
     }
 
     fun readCharacteristic(characteristic: BluetoothGattCharacteristic) {
-        bluetoothGatt?.let { gatt ->
-            gatt.readCharacteristic(characteristic)
-        } ?: run {
+        fitBluetoothLeScanner.bluetoothGatt?.readCharacteristic(characteristic) ?: run {
             Log.w(TAG, "BluetoothGatt not initialized")
             return
         }
     }
 
 
-    private val bluetoothLeScanner = bluetoothAdapter?.bluetoothLeScanner
-    private val handler = Handler(Looper.getMainLooper())
-    private var bluetoothGatt: BluetoothGatt? = null
-
     fun connectToGATT(
         context: Context,
         device: BluetoothDevice,
         autoConnect: Boolean,
     ) {
-        if (ContextCompat.checkSelfPermission(
-                context, Manifest.permission.BLUETOOTH_CONNECT
-        ) == PackageManager.PERMISSION_GRANTED) {
-            _connectivity.value = Connectivity.CONNECTING
-            bluetoothGatt = device.connectGatt(context, autoConnect, bluetoothGattCallback)
-        }
+        fitBluetoothLeScanner.stopScanning(leScanCallback)
+        _connectivity.value = Connectivity.CONNECTING
+        fitBluetoothLeScanner.connectToGATT(context, device, autoConnect, bluetoothGattCallback)
     }
 
-    // Stops scanning after 10 seconds.
     fun scanLeDevice(context: Context) {
-        if (
-            ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.BLUETOOTH_SCAN
-            ) != PackageManager.PERMISSION_GRANTED
-        ) return
-        if (!_isScanning.value) {
-            handler.postDelayed({
-                _isScanning.value = false
-                bluetoothLeScanner?.stopScan(leScanCallback)
-            }, SCAN_PERIOD)
-            _isScanning.value = true
-            bluetoothLeScanner?.startScan(leScanCallback)
-        } else {
-            _isScanning.value = false
-            bluetoothLeScanner?.stopScan(leScanCallback)
-        }
+        fitBluetoothLeScanner.scanLeDevice(context, leScanCallback)
+    }
+
+    fun stopScanning() {
+        fitBluetoothLeScanner.stopScanning(leScanCallback)
     }
 
     fun isBLESupported(): Boolean {
-        return bluetoothAdapter?.isEnabled == true
+        return fitBluetoothLeScanner.isBleSupported()
     }
 
     fun clearDevices() {
@@ -261,10 +241,7 @@ class FitBLE (
 
     @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
     fun enableBluetooth(context: Context) {
-        if (isBLEPermissionsGranted(context) && bluetoothAdapter?.isEnabled == false)  {
-            val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-            context.startActivity(enableBtIntent)
-        }
+        fitBluetoothLeScanner.enableBluetooth(context)
     }
 }
 

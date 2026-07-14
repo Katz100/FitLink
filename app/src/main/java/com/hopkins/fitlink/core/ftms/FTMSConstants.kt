@@ -1,4 +1,4 @@
-package com.hopkins.fitlink.core.ble
+package com.hopkins.fitlink.core.ftms
 
 object FTMSConstants {
     const val FTMS_MACHINE = "00001826-0000-1000-8000-00805f9b34fb"

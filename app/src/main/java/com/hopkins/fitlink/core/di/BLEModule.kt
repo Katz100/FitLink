@@ -4,6 +4,9 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.content.Context
 import com.hopkins.fitlink.core.ble.FitBLE
+import com.hopkins.fitlink.core.ble.FitBluetoothLeScanner
+import com.hopkins.fitlink.core.ble.FitBluetoothScannerImpl
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,10 +26,15 @@ class BLEModule {
         val bluetoothManager: BluetoothManager = context.getSystemService(BluetoothManager::class.java)
         return bluetoothManager.adapter
     }
+}
 
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class BluetoothScannerBindModule {
+
+    @Binds
     @Singleton
-    @Provides
-    fun provideFitBle(
-        bluetoothAdapter: BluetoothAdapter?
-    ): FitBLE = FitBLE(bluetoothAdapter)
+    abstract fun bindFitBluetoothLeScanner(
+        impl: FitBluetoothScannerImpl
+    ): FitBluetoothLeScanner
 }
