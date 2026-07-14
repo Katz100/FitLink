@@ -5,6 +5,8 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCallback
+import android.bluetooth.BluetoothGattCharacteristic
+import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.BluetoothProfile
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
@@ -21,9 +23,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import timber.log.Timber
 import java.util.UUID
-import javax.inject.Inject
 
-class FitBLE @Inject constructor(
+class FitBLE (
     private val bluetoothAdapter: BluetoothAdapter?
 ) {
     companion object {
@@ -68,12 +69,6 @@ class FitBLE @Inject constructor(
                 } == true
 
                 if (supportsFTMS && device != null) {
-                    Timber.Forest.tag(TAG).d("""
-                    Name: ${device.name ?: (scanRecord.deviceName)}
-                    Address: ${device.address}
-                    Service UUIDs: ${scanRecord.serviceUuids}
-                    Service Data: ${scanRecord.serviceData}
-                """.trimIndent())
                     _devices.value = _devices.value + setOf(device)
                 }
             }
@@ -150,12 +145,28 @@ class FitBLE @Inject constructor(
 
             if (treadmillCharacteristic != null) {
                 Timber.tag(TAG).i("Machine is a treadmill")
+                setCharacteristicNotification(treadmillCharacteristic, true)
+            }
+        }
+
+        override fun onCharacteristicRead(
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic,
+            value: ByteArray,
+            status: Int
+        ) {
+            super.onCharacteristicRead(gatt, characteristic, value, status)
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                val hexString: String = value.joinToString(separator = " ") {
+                    String.format("%02X", it)
+                }
+                Timber.tag(TAG).i("Read characteristic containing: $hexString")
             }
         }
 
         override fun onDescriptorRead(
             gatt: BluetoothGatt,
-            descriptor: android.bluetooth.BluetoothGattDescriptor,
+            descriptor: BluetoothGattDescriptor,
             status: Int,
             value: ByteArray
         ) {
@@ -163,7 +174,44 @@ class FitBLE @Inject constructor(
                 "Descriptor read: ${descriptor.uuid}, status=$status, value=${value.joinToString()}"
             )
         }
+
+        override fun onCharacteristicChanged(
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic,
+            value: ByteArray
+        ) {
+            super.onCharacteristicChanged(gatt, characteristic, value)
+            val hexString: String = value.joinToString(separator = " ") {
+                String.format("%02X", it)
+            }
+            Timber.tag(TAG).i("Characteristic changed for ${characteristic.uuid}\n new value: $hexString")
+        }
     }
+
+    fun setCharacteristicNotification(
+        characteristic: BluetoothGattCharacteristic,
+        enabled: Boolean
+    ) {
+        bluetoothGatt?.let { gatt ->
+            gatt.setCharacteristicNotification(characteristic, enabled)
+            val ccd = characteristic.getDescriptor(UUID.fromString(FTMSConstants.CLIENT_CHARACTERISTIC_CONFIG))
+            ccd.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+            gatt.writeDescriptor(ccd)
+        } ?: run {
+            Timber.tag(TAG).e("BluetoothGatt not initialized")
+
+        }
+    }
+
+    fun readCharacteristic(characteristic: BluetoothGattCharacteristic) {
+        bluetoothGatt?.let { gatt ->
+            gatt.readCharacteristic(characteristic)
+        } ?: run {
+            Log.w(TAG, "BluetoothGatt not initialized")
+            return
+        }
+    }
+
 
     private val bluetoothLeScanner = bluetoothAdapter?.bluetoothLeScanner
     private val handler = Handler(Looper.getMainLooper())
