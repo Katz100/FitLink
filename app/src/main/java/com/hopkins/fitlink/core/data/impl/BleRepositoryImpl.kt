@@ -1,6 +1,8 @@
 package com.hopkins.fitlink.core.data.impl
 
+import android.os.ParcelUuid
 import com.hopkins.fitlink.core.data.BleRepository
+import com.hopkins.fitlink.core.ftms.FTMSConstants
 import com.polidea.rxandroidble3.RxBleClient
 import com.polidea.rxandroidble3.RxBleDevice
 import com.polidea.rxandroidble3.scan.ScanFilter
@@ -32,7 +34,10 @@ class BleRepositoryImpl @Inject constructor(
             .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
             .build()
 
+        val parcelUuid: ParcelUuid = ParcelUuid.fromString(FTMSConstants.FTMS_MACHINE)
+
         val scanFilter = ScanFilter.Builder()
+            .setServiceUuid(parcelUuid)
             .build()
 
 
