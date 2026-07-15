@@ -2,14 +2,15 @@ package com.hopkins.fitlink.core.data.impl
 
 import android.os.ParcelUuid
 import com.hopkins.fitlink.core.data.BleRepository
+import com.hopkins.fitlink.core.data.EQUIPMENT_TYPE
 import com.hopkins.fitlink.core.ftms.FTMSConstants
 import com.polidea.rxandroidble3.RxBleClient
 import com.polidea.rxandroidble3.RxBleDevice
 import com.polidea.rxandroidble3.scan.ScanFilter
 import com.polidea.rxandroidble3.scan.ScanSettings
 import io.reactivex.rxjava3.disposables.Disposable
-import io.reactivex.rxjava3.schedulers.Schedulers
 import timber.log.Timber
+import java.util.UUID
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -60,24 +61,88 @@ class BleRepositoryImpl @Inject constructor(
             )
     }
 
-    override fun connectToDevice(device: RxBleDevice) {
+    override fun connectAndSubscribeToCharacteristic(
+        characteristic: UUID,
+        device: RxBleDevice,
+        onBytesReceived: (ByteArray) -> Unit,
+        onNotificationCreated: () -> Unit,
+        onNotificationEnded: () -> Unit,
+        onNotificationError: (Throwable) -> Unit,
+    ) {
         stopScanning()
-
         connectDisposable?.dispose()
 
         connectDisposable = device.establishConnection(false)
-            .subscribeOn(Schedulers.io())
-            .observeOn(Schedulers.io())
+            .flatMap { connection ->
+                connection.setupNotification(characteristic)
+            }
+            .doOnNext {
+                Timber.tag(TAG).i("Notification set up")
+                onNotificationCreated()
+            }
+            .flatMap { stream ->
+                stream
+            }
             .doFinally {
                 connectDisposable = null
-                Timber.tag(TAG).i("Connection observable has been disposed")
+                Timber.tag(TAG).i("Connection / notification stream ended")
+                onNotificationEnded()
             }
             .subscribe(
-                { connection ->
-                    Timber.tag(TAG).i("Connected to ${device.name ?: device.macAddress}")
+                { bytes ->
+                    val hex = bytes.joinToString(separator = " ") { byte ->
+                        "%02X".format(byte.toInt() and 0xFF)
+                    }
+
+                    Timber.tag(TAG).i("Received bytes hex: $hex")
+                    onBytesReceived(bytes)
                 },
-                { throwable ->
-                    Timber.tag(TAG).e(throwable, "There was an error connecting to device: ${device.macAddress}")
+                { e ->
+                    Timber.tag(TAG).e("Notification error: $e")
+                    onNotificationError(e)
+                }
+            )
+    }
+
+    override fun connectToDevice(device: RxBleDevice) {
+        TODO("Not yet implemented")
+    }
+
+    override fun discoverCharacteristic(
+        device: RxBleDevice,
+        onEquipmentCharacteristicFound: (EQUIPMENT_TYPE) -> Unit,
+        onFinished: () -> Unit,
+    ) {
+        stopScanning()
+        connectDisposable?.dispose()
+
+         connectDisposable = device.establishConnection(false)
+            .flatMapSingle { connection ->
+                connection.discoverServices()
+            }.map { services ->
+                services.bluetoothGattServices.firstOrNull {
+                    it.uuid == UUID.fromString(FTMSConstants.FTMS_MACHINE)
+                }
+                    ?.characteristics
+                    ?: emptyList()
+            }
+             .doFinally {
+                 Timber.tag(TAG).i("Finished discovering characteristics")
+                 onFinished()
+             }
+            .subscribe(
+                { characteristic ->
+                    characteristic.forEach { ch ->
+                        if (ch.uuid == UUID.fromString(FTMSConstants.TREADMILL_CHARACTERISTIC)) {
+                            Timber.tag(TAG).i("Found Treadmill Characteristic")
+                            onEquipmentCharacteristicFound(EQUIPMENT_TYPE.TREADMILL)
+                        }
+                    }
+                    connectDisposable?.dispose()
+                    connectDisposable = null
+                },
+                { t ->
+                    Timber.tag(TAG).e("Error getting characteristics: $t")
                 }
             )
     }

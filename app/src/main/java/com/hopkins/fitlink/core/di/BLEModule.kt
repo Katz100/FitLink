@@ -3,7 +3,6 @@ package com.hopkins.fitlink.core.di
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.content.Context
-import com.hopkins.fitlink.core.ble.FitBLE
 import com.hopkins.fitlink.core.ble.FitBluetoothLeScanner
 import com.hopkins.fitlink.core.ble.FitBluetoothScannerImpl
 import com.hopkins.fitlink.core.data.BleRepository
