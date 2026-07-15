@@ -7,4 +7,6 @@ interface BleRepository {
         onDeviceScanned: (RxBleDevice) -> Unit,
         onScanningFinished: () -> Unit,
     )
+
+    fun connectToDevice(device: RxBleDevice)
 }

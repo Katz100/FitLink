@@ -54,10 +54,8 @@ class HomeScreenViewModel @Inject constructor(
     }
 
     fun connectToDevice(
-        context: Context,
-        autoConnect: Boolean = true,
-        device: BluetoothDevice,
+        device: RxBleDevice
     ) {
-
+        bleRepository.connectToDevice(device)
     }
 }
