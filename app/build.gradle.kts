@@ -60,6 +60,8 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    implementation ("com.polidea.rxandroidble3:rxandroidble:1.19.1")
+
     val nav_version = "2.9.8"
 
     // Jetpack Compose integration

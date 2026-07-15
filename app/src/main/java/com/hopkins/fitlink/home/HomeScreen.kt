@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.hopkins.fitlink.core.ble.Connectivity
 import com.hopkins.fitlink.core.ble.FitBLE
 import com.hopkins.fitlink.core.ui.DeviceItem
 
@@ -44,8 +45,8 @@ fun HomeScreen(
 ) {
     val context = LocalContext.current
     val devices = viewModel.devices.collectAsStateWithLifecycle().value
-    val isScanning = viewModel.isScanning.collectAsStateWithLifecycle().value
-    val connectivity = viewModel.connectivity.collectAsStateWithLifecycle().value
+    val isScanning = viewModel.scanning.collectAsStateWithLifecycle().value
+    val connectivity = Connectivity.DISCONNECTED
 
     val bluetoothPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
@@ -122,7 +123,7 @@ fun HomeScreen(
                     }
                 }
             }
-            items(devices.toList(), key = { it.address }) { device ->
+            items(devices.toList(), key = { it.macAddress }) { device ->
                 if (ContextCompat.checkSelfPermission(
                         context, Manifest.permission.BLUETOOTH_SCAN
                 ) == PackageManager.PERMISSION_GRANTED) {
@@ -133,15 +134,11 @@ fun HomeScreen(
                             .height(100.dp)
                             .padding(16.dp),
                         deviceName = device.name ?: "N/A",
-                        deviceAddress = device.address,
+                        deviceAddress = device.macAddress,
                         deviceNameTextStyle = MaterialTheme.typography.titleMedium,
                         deviceAddressTextStyle = MaterialTheme.typography.bodySmall,
                         onConnectClicked = {
-                            viewModel.connectToDevice(
-                                context = context,
-                                autoConnect = false,
-                                device = device,
-                            )
+
                         }
                     )
                 }

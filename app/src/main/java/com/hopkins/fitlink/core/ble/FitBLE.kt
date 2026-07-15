@@ -13,9 +13,11 @@ import android.bluetooth.le.ScanResult
 import android.content.Context
 import android.content.pm.PackageManager
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.RequiresPermission
 import androidx.core.content.ContextCompat
 import com.hopkins.fitlink.core.ftms.FTMSConstants
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,7 +27,8 @@ import javax.inject.Inject
 
 @SuppressLint("MissingPermission")
 class FitBLE @Inject constructor(
-    private val fitBluetoothLeScanner: FitBluetoothLeScanner
+    private val fitBluetoothLeScanner: FitBluetoothLeScanner,
+    @ApplicationContext context: Context,
 ) {
     companion object {
         private const val TAG = "FitBLE"
@@ -61,12 +64,13 @@ class FitBLE @Inject constructor(
             val device = result.device
             val scanRecord = result.scanRecord
 
+
             if (!_devices.value.contains(device)) {
                 val supportsFTMS = scanRecord?.serviceUuids?.any { service ->
                     service.uuid.toString() == FTMSConstants.FTMS_MACHINE
                 } == true
 
-                if (!supportsFTMS && device != null) {
+                if (supportsFTMS && device != null) {
                     _devices.value = _devices.value + setOf(device)
                 }
             }
@@ -183,10 +187,11 @@ class FitBLE @Inject constructor(
             value: ByteArray
         ) {
             super.onCharacteristicChanged(gatt, characteristic, value)
-            val hexString: String = value.joinToString(separator = " ") {
-                String.format("%02X", it)
+            val speed = FTMSConstants.parseSpeed(value)
+            Timber.tag(TAG).d("Speed: $speed")
+            if (speed != 0.0) {
+                Toast.makeText(context, "Speed: $speed", Toast.LENGTH_SHORT).show()
             }
-            Timber.tag(TAG).i("Characteristic changed for ${characteristic.uuid}\n new value: $hexString")
         }
     }
 

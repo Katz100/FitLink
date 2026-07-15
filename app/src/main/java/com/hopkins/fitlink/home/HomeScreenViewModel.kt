@@ -7,34 +7,50 @@ import androidx.annotation.RequiresPermission
 import androidx.lifecycle.ViewModel
 import com.hopkins.fitlink.core.ble.Connectivity
 import com.hopkins.fitlink.core.ble.FitBLE
+import com.hopkins.fitlink.core.data.BleRepository
+import com.polidea.rxandroidble3.RxBleDevice
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(
-    private val fitBLE: FitBLE
+    private val bleRepository: BleRepository,
 ): ViewModel() {
 
-    val devices: StateFlow<Set<BluetoothDevice>> = fitBLE.devices
-    val isScanning: StateFlow<Boolean> = fitBLE.isScanning
-    val connectivity: StateFlow<Connectivity> = fitBLE.connectivity
+    private val _devices = MutableStateFlow<List<RxBleDevice>>(emptyList())
+    val devices: StateFlow<List<RxBleDevice>> = _devices.asStateFlow()
+
+    private val _scanning = MutableStateFlow<Boolean>(false)
+    val scanning: StateFlow<Boolean> = _scanning.asStateFlow()
+
+   // val connectivity: StateFlow<Connectivity> = fitBLE.connectivity
 
     fun scanForDevices(context: Context) {
-        fitBLE.scanLeDevice(context)
+        _scanning.value = true
+        bleRepository.scanDevices(
+            onDeviceScanned = { device ->
+                if (!_devices.value.contains(device)) {
+                    _devices.value = _devices.value + device
+                }
+            },
+            onScanningFinished = {
+                _scanning.value = false
+            }
+        )
     }
 
     fun clearDevices() {
-        fitBLE.clearDevices()
     }
 
     fun isBleEnabled(): Boolean {
-        return fitBLE.isBLESupported()
+        return true
     }
 
     @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
     fun enableBle(context: Context) {
-        fitBLE.enableBluetooth(context)
     }
 
     fun connectToDevice(
@@ -42,10 +58,6 @@ class HomeScreenViewModel @Inject constructor(
         autoConnect: Boolean = true,
         device: BluetoothDevice,
     ) {
-        fitBLE.connectToGATT(
-            context = context,
-            device = device,
-            autoConnect = autoConnect
-        )
+
     }
 }

@@ -6,6 +6,9 @@ import android.content.Context
 import com.hopkins.fitlink.core.ble.FitBLE
 import com.hopkins.fitlink.core.ble.FitBluetoothLeScanner
 import com.hopkins.fitlink.core.ble.FitBluetoothScannerImpl
+import com.hopkins.fitlink.core.data.BleRepository
+import com.hopkins.fitlink.core.data.impl.BleRepositoryImpl
+import com.polidea.rxandroidble3.RxBleClient
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -20,6 +23,14 @@ class BLEModule {
 
     @Singleton
     @Provides
+    fun provideRxBleClient(
+        @ApplicationContext context: Context,
+    ): RxBleClient {
+        return RxBleClient.create(context)
+    }
+
+    @Singleton
+    @Provides
     fun provideBluetoothAdapter(
         @ApplicationContext context: Context
     ): BluetoothAdapter? {
@@ -31,6 +42,11 @@ class BLEModule {
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class BluetoothScannerBindModule {
+
+    @Binds
+    abstract fun bindBleRepository(
+        impl: BleRepositoryImpl
+    ): BleRepository
 
     @Binds
     @Singleton
