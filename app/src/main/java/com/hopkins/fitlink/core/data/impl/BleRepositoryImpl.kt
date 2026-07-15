@@ -18,6 +18,7 @@ class BleRepositoryImpl @Inject constructor(
 ): BleRepository {
     companion object {
         const val TAG = "BleRepository"
+        const val TIMEOUT = 10L
     }
 
     private var scanDisposable: Disposable? = null
@@ -43,7 +44,7 @@ class BleRepositoryImpl @Inject constructor(
 
         scanDisposable = rxBleClient
             .scanBleDevices(scanSettings, scanFilter)
-            .take(10, TimeUnit.SECONDS)
+            .take(TIMEOUT, TimeUnit.SECONDS)
             .doFinally {
                 scanDisposable = null
                 Timber.tag(TAG).i("Scanning has stopped")
