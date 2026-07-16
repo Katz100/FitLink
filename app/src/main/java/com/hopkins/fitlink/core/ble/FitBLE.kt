@@ -187,11 +187,11 @@ class FitBLE @Inject constructor(
             value: ByteArray
         ) {
             super.onCharacteristicChanged(gatt, characteristic, value)
-            val speed = FTMSConstants.parseSpeed(value)
-            Timber.tag(TAG).d("Speed: $speed")
-            if (speed != 0.0) {
-                Toast.makeText(context, "Speed: $speed", Toast.LENGTH_SHORT).show()
-            }
+//            val speed = FTMSConstants.parseSpeed(value)
+//            Timber.tag(TAG).d("Speed: $speed")
+//            if (speed != 0.0) {
+//                Toast.makeText(context, "Speed: $speed", Toast.LENGTH_SHORT).show()
+//            }
         }
     }
 
