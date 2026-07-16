@@ -48,6 +48,8 @@ interface BleRepository {
         onEquipmentCharacteristicFound: (EquipmentType) -> Unit,
         onFinished: () -> Unit,
     )
+
+    fun isBleEnabled(): Boolean
 }
 
 enum class EquipmentType {

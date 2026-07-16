@@ -147,6 +147,12 @@ class BleRepositoryImpl @Inject constructor(
             )
     }
 
+    override fun isBleEnabled(): Boolean {
+        val state = rxBleClient.state
+
+        return state != RxBleClient.State.BLUETOOTH_NOT_ENABLED
+    }
+
     private fun stopScanning() {
         scanDisposable?.dispose()
         scanDisposable = null

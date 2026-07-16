@@ -1,6 +1,8 @@
 package com.hopkins.fitlink.home
 
 import android.Manifest
+import android.bluetooth.BluetoothAdapter
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.util.Log
 import android.widget.Toast
@@ -78,10 +80,11 @@ fun HomeScreen(
                                 if (ContextCompat.checkSelfPermission(
                                         context, Manifest.permission.BLUETOOTH_CONNECT
                                 ) == PackageManager.PERMISSION_GRANTED) {
-                                    viewModel.enableBle(context)
+                                    val enableBleIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+                                    context.startActivity(enableBleIntent)
                                 }
                             } else if (FitBLE.isBLEPermissionsGranted(context)) {
-                                viewModel.scanForDevices(context)
+                                viewModel.scanForDevices()
                             } else {
                                 bluetoothPermissionLauncher.launch(FitBLE.BLE_PERMISSIONS)
                             }

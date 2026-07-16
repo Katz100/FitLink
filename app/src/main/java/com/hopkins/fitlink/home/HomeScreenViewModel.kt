@@ -1,24 +1,17 @@
 package com.hopkins.fitlink.home
 
-import android.Manifest
-import android.content.Context
-import androidx.annotation.RequiresPermission
 import androidx.lifecycle.ViewModel
 import com.hopkins.fitlink.core.data.BleRepository
-import com.hopkins.fitlink.core.ftms.FTMSConstants
 import com.polidea.rxandroidble3.RxBleDevice
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(
     private val bleRepository: BleRepository,
-    @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
     private val _devices = MutableStateFlow<List<RxBleDevice>>(emptyList())
@@ -27,9 +20,7 @@ class HomeScreenViewModel @Inject constructor(
     private val _scanning = MutableStateFlow<Boolean>(false)
     val scanning: StateFlow<Boolean> = _scanning.asStateFlow()
 
-    // val connectivity: StateFlow<Connectivity> = fitBLE.connectivity
-
-    fun scanForDevices(context: Context) {
+    fun scanForDevices() {
         _scanning.value = true
         bleRepository.scanDevices(
             onDeviceScanned = { device ->
@@ -44,13 +35,11 @@ class HomeScreenViewModel @Inject constructor(
     }
 
     fun clearDevices() {
+        _devices.value = emptyList()
     }
 
     fun isBleEnabled(): Boolean {
-        return true
+        return bleRepository.isBleEnabled()
     }
 
-    @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
-    fun enableBle(context: Context) {
-    }
 }
