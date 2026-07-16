@@ -137,7 +137,7 @@ fun HomeScreen(
                             .fillMaxWidth()
                             .height(100.dp)
                             .padding(16.dp),
-                        deviceName = device.name ?: "N/A",
+                        deviceName = device.name,
                         deviceAddress = device.macAddress,
                         deviceNameTextStyle = MaterialTheme.typography.titleMedium,
                         deviceAddressTextStyle = MaterialTheme.typography.bodySmall,

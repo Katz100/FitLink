@@ -12,6 +12,12 @@ import com.polidea.rxandroidble3.RxBleDevice
 import com.polidea.rxandroidble3.scan.ScanFilter
 import com.polidea.rxandroidble3.scan.ScanSettings
 import io.reactivex.rxjava3.disposables.Disposable
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.UUID
 import java.util.concurrent.TimeUnit
@@ -42,7 +48,7 @@ class BleRepositoryImpl @Inject constructor(
         val parcelUuid: ParcelUuid = ParcelUuid.fromString(FTMSConstants.FTMS_MACHINE)
 
         val scanFilter = ScanFilter.Builder()
-          //  .setServiceUuid(parcelUuid)
+            .setServiceUuid(parcelUuid)
             .build()
 
 
@@ -130,6 +136,7 @@ class BleRepositoryImpl @Inject constructor(
             }
              .doFinally {
                  Timber.tag(TAG).i("Finished discovering characteristics")
+                 connectDisposable = null
                  onFinished()
              }
             .subscribe(
@@ -160,8 +167,11 @@ class BleRepositoryImpl @Inject constructor(
     }
 }
 
-class BleRepositoryFake: BleRepository {
+class BleRepositoryFake @Inject constructor(
+    private val scope: CoroutineScope
+): BleRepository {
 
+    var isBleEnabled: Boolean = true
     private val deviceName = "TestDevice"
     private val macAddress = "AA:BB:CC:DD:EE:FF"
     private val rssi = -42
@@ -173,11 +183,22 @@ class BleRepositoryFake: BleRepository {
     private val descriptorUUID = UUID.fromString("00001337-0000-1000-8000-00805f9b34fb")
     private val descriptorData = "Config".toByteArray()
 
+
     override fun scanDevices(
         onDeviceScanned: (BleDevice) -> Unit,
         onScanningFinished: () -> Unit
     ) {
+        val devices = flowOf(BleDevice(deviceName, macAddress))
 
+        scope.launch {
+            devices
+                .onCompletion {
+                    onScanningFinished()
+                }
+                .collect { device ->
+                    onDeviceScanned(device)
+            }
+        }
     }
 
     override fun connectAndSubscribeToCharacteristic(
@@ -186,7 +207,7 @@ class BleRepositoryFake: BleRepository {
         onBytesReceived: (ByteArray) -> Unit,
         onNotificationChanged: (NotificationChanged) -> Unit
     ) {
-        TODO("Not yet implemented")
+
     }
 
     override fun connectToDevice(device: RxBleDevice) {
@@ -202,7 +223,7 @@ class BleRepositoryFake: BleRepository {
     }
 
     override fun isBleEnabled(): Boolean {
-        TODO("Not yet implemented")
+        return isBleEnabled
     }
 
 }
