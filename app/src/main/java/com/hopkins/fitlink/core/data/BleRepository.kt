@@ -1,5 +1,6 @@
 package com.hopkins.fitlink.core.data
 
+import com.hopkins.fitlink.core.ftms.EquipmentType
 import com.polidea.rxandroidble3.RxBleDevice
 import java.util.UUID
 
@@ -52,10 +53,6 @@ interface BleRepository {
     )
 
     fun isBleEnabled(): Boolean
-}
-
-enum class EquipmentType {
-    TREADMILL,
 }
 
 sealed interface NotificationChanged {

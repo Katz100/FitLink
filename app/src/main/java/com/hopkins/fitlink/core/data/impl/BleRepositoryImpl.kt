@@ -3,9 +3,9 @@ package com.hopkins.fitlink.core.data.impl
 import android.os.ParcelUuid
 import com.hopkins.fitlink.core.data.BleDevice
 import com.hopkins.fitlink.core.data.BleRepository
-import com.hopkins.fitlink.core.data.EquipmentType
 import com.hopkins.fitlink.core.data.NotificationChanged
 import com.hopkins.fitlink.core.data.toBleDevice
+import com.hopkins.fitlink.core.ftms.EquipmentType
 import com.hopkins.fitlink.core.ftms.FTMSConstants
 import com.polidea.rxandroidble3.RxBleClient
 import com.polidea.rxandroidble3.RxBleDevice
@@ -13,8 +13,6 @@ import com.polidea.rxandroidble3.scan.ScanFilter
 import com.polidea.rxandroidble3.scan.ScanSettings
 import io.reactivex.rxjava3.disposables.Disposable
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
@@ -167,21 +165,13 @@ class BleRepositoryImpl @Inject constructor(
     }
 }
 
-class BleRepositoryFake @Inject constructor(
+class BleRepositoryFake(
     private val scope: CoroutineScope
 ): BleRepository {
 
-    var isBleEnabled: Boolean = true
+    var isBleOn: Boolean = true
     private val deviceName = "TestDevice"
     private val macAddress = "AA:BB:CC:DD:EE:FF"
-    private val rssi = -42
-    private val serviceUUID = UUID.fromString(FTMSConstants.FTMS_MACHINE)
-    private val characteristicUUID = UUID.fromString(FTMSConstants.TREADMILL_CHARACTERISTIC)
-    private val characteristicNotifiedUUID = UUID.fromString("00002a29-0000-1000-8000-00805f9b34fb")
-    private val clientCharacteristicConfigDescriptorUuid = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
-    private val characteristicData = "Polidea".toByteArray()
-    private val descriptorUUID = UUID.fromString("00001337-0000-1000-8000-00805f9b34fb")
-    private val descriptorData = "Config".toByteArray()
 
 
     override fun scanDevices(
@@ -223,7 +213,7 @@ class BleRepositoryFake @Inject constructor(
     }
 
     override fun isBleEnabled(): Boolean {
-        return isBleEnabled
+        return isBleOn
     }
 
 }

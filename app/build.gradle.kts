@@ -62,6 +62,8 @@ dependencies {
 
     implementation ("com.polidea.rxandroidble3:rxandroidble:1.19.1")
 
+    testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.11.0")
+
     val nav_version = "2.9.8"
 
     // Jetpack Compose integration
@@ -85,4 +87,5 @@ dependencies {
     androidTestImplementation("com.google.dagger:hilt-android-testing:$hiltVersion")
     kaptTest("com.google.dagger:hilt-android-compiler:$hiltVersion")
     kaptAndroidTest("com.google.dagger:hilt-android-compiler:$hiltVersion")
+    testImplementation(kotlin("test"))
 }
