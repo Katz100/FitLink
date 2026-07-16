@@ -1,9 +1,11 @@
 package com.hopkins.fitlink.core.data.impl
 
 import android.os.ParcelUuid
+import com.hopkins.fitlink.core.data.BleDevice
 import com.hopkins.fitlink.core.data.BleRepository
 import com.hopkins.fitlink.core.data.EquipmentType
 import com.hopkins.fitlink.core.data.NotificationChanged
+import com.hopkins.fitlink.core.data.toBleDevice
 import com.hopkins.fitlink.core.ftms.FTMSConstants
 import com.polidea.rxandroidble3.RxBleClient
 import com.polidea.rxandroidble3.RxBleDevice
@@ -27,7 +29,7 @@ class BleRepositoryImpl @Inject constructor(
     private var connectDisposable: Disposable? = null
 
     override fun scanDevices(
-        onDeviceScanned: (RxBleDevice) -> Unit,
+        onDeviceScanned: (BleDevice) -> Unit,
         onScanningFinished: () -> Unit,
     ) {
         scanDisposable?.dispose()
@@ -40,7 +42,7 @@ class BleRepositoryImpl @Inject constructor(
         val parcelUuid: ParcelUuid = ParcelUuid.fromString(FTMSConstants.FTMS_MACHINE)
 
         val scanFilter = ScanFilter.Builder()
-            .setServiceUuid(parcelUuid)
+          //  .setServiceUuid(parcelUuid)
             .build()
 
 
@@ -54,7 +56,7 @@ class BleRepositoryImpl @Inject constructor(
             }
             .subscribe(
                 { scanResult ->
-                    onDeviceScanned(scanResult.bleDevice)
+                    onDeviceScanned(scanResult.bleDevice.toBleDevice())
                 },
                 { throwable ->
                     Timber.tag(TAG).e(throwable, "There was an error scanning devices")
@@ -149,7 +151,6 @@ class BleRepositoryImpl @Inject constructor(
 
     override fun isBleEnabled(): Boolean {
         val state = rxBleClient.state
-
         return state != RxBleClient.State.BLUETOOTH_NOT_ENABLED
     }
 
@@ -157,4 +158,51 @@ class BleRepositoryImpl @Inject constructor(
         scanDisposable?.dispose()
         scanDisposable = null
     }
+}
+
+class BleRepositoryFake: BleRepository {
+
+    private val deviceName = "TestDevice"
+    private val macAddress = "AA:BB:CC:DD:EE:FF"
+    private val rssi = -42
+    private val serviceUUID = UUID.fromString(FTMSConstants.FTMS_MACHINE)
+    private val characteristicUUID = UUID.fromString(FTMSConstants.TREADMILL_CHARACTERISTIC)
+    private val characteristicNotifiedUUID = UUID.fromString("00002a29-0000-1000-8000-00805f9b34fb")
+    private val clientCharacteristicConfigDescriptorUuid = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
+    private val characteristicData = "Polidea".toByteArray()
+    private val descriptorUUID = UUID.fromString("00001337-0000-1000-8000-00805f9b34fb")
+    private val descriptorData = "Config".toByteArray()
+
+    override fun scanDevices(
+        onDeviceScanned: (BleDevice) -> Unit,
+        onScanningFinished: () -> Unit
+    ) {
+
+    }
+
+    override fun connectAndSubscribeToCharacteristic(
+        characteristic: UUID,
+        deviceAddress: String,
+        onBytesReceived: (ByteArray) -> Unit,
+        onNotificationChanged: (NotificationChanged) -> Unit
+    ) {
+        TODO("Not yet implemented")
+    }
+
+    override fun connectToDevice(device: RxBleDevice) {
+        TODO("Not yet implemented")
+    }
+
+    override fun discoverCharacteristic(
+        device: RxBleDevice,
+        onEquipmentCharacteristicFound: (EquipmentType) -> Unit,
+        onFinished: () -> Unit
+    ) {
+        TODO("Not yet implemented")
+    }
+
+    override fun isBleEnabled(): Boolean {
+        TODO("Not yet implemented")
+    }
+
 }

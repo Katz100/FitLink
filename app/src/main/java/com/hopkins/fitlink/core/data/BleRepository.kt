@@ -16,7 +16,7 @@ interface BleRepository {
      * @param onScanningFinished the lambda that is called when scanning is finished
      */
     fun scanDevices(
-        onDeviceScanned: (RxBleDevice) -> Unit,
+        onDeviceScanned: (BleDevice) -> Unit,
         onScanningFinished: () -> Unit,
     )
 
@@ -25,6 +25,8 @@ interface BleRepository {
      * @param characteristic The characteristic you want to subscribe to
      * @param deviceAddress The device that contains the characteristic
      * @param onBytesReceived The lambda that is called when the characteristic is updated.
+     * @param onNotificationChanged The lambda that is called when there is a change in the notification.
+     * Passes a NotificationChanged object as a parameter
      */
     fun connectAndSubscribeToCharacteristic(
         characteristic: UUID,
@@ -60,4 +62,16 @@ sealed interface NotificationChanged {
     data object NotificationCreated: NotificationChanged
     data object NotificationEnded: NotificationChanged
     data class NotificationError(val e: Throwable): NotificationChanged
+}
+
+data class BleDevice(
+    val name: String,
+    val macAddress: String,
+)
+
+fun RxBleDevice.toBleDevice(): BleDevice {
+    return BleDevice(
+        name = this.name ?: "N/A",
+        macAddress = this.macAddress
+    )
 }

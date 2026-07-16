@@ -1,6 +1,7 @@
 package com.hopkins.fitlink.home
 
 import androidx.lifecycle.ViewModel
+import com.hopkins.fitlink.core.data.BleDevice
 import com.hopkins.fitlink.core.data.BleRepository
 import com.polidea.rxandroidble3.RxBleDevice
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,8 +15,8 @@ class HomeScreenViewModel @Inject constructor(
     private val bleRepository: BleRepository,
 ) : ViewModel() {
 
-    private val _devices = MutableStateFlow<List<RxBleDevice>>(emptyList())
-    val devices: StateFlow<List<RxBleDevice>> = _devices.asStateFlow()
+    private val _devices = MutableStateFlow<List<BleDevice>>(emptyList())
+    val devices: StateFlow<List<BleDevice>> = _devices.asStateFlow()
 
     private val _scanning = MutableStateFlow<Boolean>(false)
     val scanning: StateFlow<Boolean> = _scanning.asStateFlow()
