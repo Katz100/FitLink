@@ -2,7 +2,8 @@ package com.hopkins.fitlink.core.data.impl
 
 import android.os.ParcelUuid
 import com.hopkins.fitlink.core.data.BleRepository
-import com.hopkins.fitlink.core.data.EQUIPMENT_TYPE
+import com.hopkins.fitlink.core.data.EquipmentType
+import com.hopkins.fitlink.core.data.NotificationChanged
 import com.hopkins.fitlink.core.ftms.FTMSConstants
 import com.polidea.rxandroidble3.RxBleClient
 import com.polidea.rxandroidble3.RxBleDevice
@@ -63,14 +64,13 @@ class BleRepositoryImpl @Inject constructor(
 
     override fun connectAndSubscribeToCharacteristic(
         characteristic: UUID,
-        device: RxBleDevice,
+        deviceAddress: String,
         onBytesReceived: (ByteArray) -> Unit,
-        onNotificationCreated: () -> Unit,
-        onNotificationEnded: () -> Unit,
-        onNotificationError: (Throwable) -> Unit,
+        onNotificationChanged: (NotificationChanged) -> Unit,
     ) {
         stopScanning()
         connectDisposable?.dispose()
+        val device = rxBleClient.getBleDevice(deviceAddress)
 
         connectDisposable = device.establishConnection(false)
             .flatMap { connection ->
@@ -78,7 +78,7 @@ class BleRepositoryImpl @Inject constructor(
             }
             .doOnNext {
                 Timber.tag(TAG).i("Notification set up")
-                onNotificationCreated()
+                onNotificationChanged(NotificationChanged.NotificationCreated)
             }
             .flatMap { stream ->
                 stream
@@ -86,7 +86,7 @@ class BleRepositoryImpl @Inject constructor(
             .doFinally {
                 connectDisposable = null
                 Timber.tag(TAG).i("Connection / notification stream ended")
-                onNotificationEnded()
+                onNotificationChanged(NotificationChanged.NotificationEnded)
             }
             .subscribe(
                 { bytes ->
@@ -99,7 +99,7 @@ class BleRepositoryImpl @Inject constructor(
                 },
                 { e ->
                     Timber.tag(TAG).e("Notification error: $e")
-                    onNotificationError(e)
+                    onNotificationChanged(NotificationChanged.NotificationError(e))
                 }
             )
     }
@@ -110,7 +110,7 @@ class BleRepositoryImpl @Inject constructor(
 
     override fun discoverCharacteristic(
         device: RxBleDevice,
-        onEquipmentCharacteristicFound: (EQUIPMENT_TYPE) -> Unit,
+        onEquipmentCharacteristicFound: (EquipmentType) -> Unit,
         onFinished: () -> Unit,
     ) {
         stopScanning()
@@ -135,7 +135,7 @@ class BleRepositoryImpl @Inject constructor(
                     characteristic.forEach { ch ->
                         if (ch.uuid == UUID.fromString(FTMSConstants.TREADMILL_CHARACTERISTIC)) {
                             Timber.tag(TAG).i("Found Treadmill Characteristic")
-                            onEquipmentCharacteristicFound(EQUIPMENT_TYPE.TREADMILL)
+                            onEquipmentCharacteristicFound(EquipmentType.TREADMILL)
                         }
                     }
                     connectDisposable?.dispose()

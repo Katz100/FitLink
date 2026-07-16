@@ -7,5 +7,5 @@ sealed interface Screen {
     object Home: Screen
 
     @Serializable
-    object Workout: Screen
+    data class ActiveWorkout(val macAddress: String): Screen
 }

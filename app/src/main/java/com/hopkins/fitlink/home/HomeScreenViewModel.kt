@@ -53,22 +53,4 @@ class HomeScreenViewModel @Inject constructor(
     @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
     fun enableBle(context: Context) {
     }
-
-    fun connectToDevice(
-        device: RxBleDevice
-    ) {
-        bleRepository.connectAndSubscribeToCharacteristic(
-            device = device,
-            characteristic = UUID.fromString(
-                FTMSConstants.TREADMILL_CHARACTERISTIC
-            ),
-            onNotificationEnded = {
-            },
-            onNotificationError = {
-            },
-            onNotificationCreated = {
-            },
-            onBytesReceived = {}
-        )
-    }
 }

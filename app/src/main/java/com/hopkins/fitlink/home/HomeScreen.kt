@@ -41,7 +41,8 @@ import com.hopkins.fitlink.core.ui.DeviceItem
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    viewModel: HomeScreenViewModel = hiltViewModel()
+    viewModel: HomeScreenViewModel = hiltViewModel(),
+    onDeviceClicked: (String) -> Unit,
 ) {
     val context = LocalContext.current
     val devices = viewModel.devices.collectAsStateWithLifecycle().value
@@ -138,7 +139,7 @@ fun HomeScreen(
                         deviceNameTextStyle = MaterialTheme.typography.titleMedium,
                         deviceAddressTextStyle = MaterialTheme.typography.bodySmall,
                         onConnectClicked = {
-                            viewModel.connectToDevice(device)
+                            onDeviceClicked(device.macAddress)
                         }
                     )
                 }
