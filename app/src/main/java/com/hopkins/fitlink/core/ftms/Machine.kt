@@ -1,6 +1,6 @@
 package com.hopkins.fitlink.core.ftms
 
-import com.hopkins.fitlink.Workout.hasFlag
+import com.hopkins.fitlink.feature.workout.hasFlag
 import com.polidea.rxandroidble3.helpers.ValueInterpreter
 
 abstract class Machine<Data>(

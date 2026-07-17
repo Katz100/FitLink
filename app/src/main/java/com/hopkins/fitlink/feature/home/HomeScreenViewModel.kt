@@ -1,4 +1,4 @@
-package com.hopkins.fitlink.home
+package com.hopkins.fitlink.feature.home
 
 import androidx.lifecycle.ViewModel
 import com.hopkins.fitlink.core.data.BleDevice

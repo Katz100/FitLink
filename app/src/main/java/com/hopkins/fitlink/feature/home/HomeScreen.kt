@@ -1,4 +1,4 @@
-package com.hopkins.fitlink.home
+package com.hopkins.fitlink.feature.home
 
 import android.Manifest
 import android.bluetooth.BluetoothAdapter

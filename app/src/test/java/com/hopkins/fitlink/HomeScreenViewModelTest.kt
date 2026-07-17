@@ -2,7 +2,7 @@ package com.hopkins.fitlink
 
 import com.hopkins.fitlink.core.data.BleDevice
 import com.hopkins.fitlink.core.data.impl.BleRepositoryFake
-import com.hopkins.fitlink.home.HomeScreenViewModel
+import com.hopkins.fitlink.feature.home.HomeScreenViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestDispatcher

@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.hopkins.fitlink.Workout.WorkoutScreen
-import com.hopkins.fitlink.home.HomeScreen
+import com.hopkins.fitlink.feature.workout.WorkoutScreen
+import com.hopkins.fitlink.feature.home.HomeScreen
 
 @Composable
 fun Nav() {

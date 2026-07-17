@@ -1,4 +1,4 @@
-package com.hopkins.fitlink.Workout
+package com.hopkins.fitlink.feature.workout
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
