@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.navigation.toRoute
 import com.hopkins.fitlink.core.data.BleRepository
+import com.hopkins.fitlink.core.data.NotificationChanged
 import com.hopkins.fitlink.core.ftms.EquipmentType
 import com.hopkins.fitlink.core.ftms.FTMSConstants
 import com.hopkins.fitlink.nav.Screen
@@ -26,6 +27,9 @@ class WorkoutScreenViewModel @Inject constructor(
 
     private val _equipmentType = MutableStateFlow<EquipmentType>(EquipmentType.TREADMILL)
     val equipmentType = _equipmentType.asStateFlow()
+
+    private val _notificationStatus = MutableStateFlow<NotificationChanged>(NotificationChanged.NotificationLoading)
+    val notificationStatus = _notificationStatus.asStateFlow()
 
     init {
         bleRepository.discoverCharacteristic(
@@ -72,7 +76,9 @@ class WorkoutScreenViewModel @Inject constructor(
 
                 _speed.value = speedMph
             },
-            onNotificationChanged = {}
+            onNotificationChanged = { notification ->
+                _notificationStatus.value = notification
+            }
         )
     }
 }
