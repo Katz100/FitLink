@@ -145,6 +145,8 @@ class BleRepositoryImpl @Inject constructor(
                         if (ch.uuid == UUID.fromString(FTMSConstants.TREADMILL_CHARACTERISTIC)) {
                             Timber.tag(TAG).i("Found Treadmill Characteristic")
                             onEquipmentCharacteristicFound(EquipmentType.TREADMILL)
+                        } else {
+                            Timber.tag(TAG).i("Found: ${ch.uuid}")
                         }
                     }
                     connectDisposable?.dispose()

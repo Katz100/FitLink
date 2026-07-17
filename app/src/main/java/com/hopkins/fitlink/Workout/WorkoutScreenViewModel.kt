@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.navigation.toRoute
 import com.hopkins.fitlink.core.data.BleRepository
+import com.hopkins.fitlink.core.ftms.EquipmentType
 import com.hopkins.fitlink.core.ftms.FTMSConstants
 import com.hopkins.fitlink.nav.Screen
 import com.polidea.rxandroidble3.helpers.ValueInterpreter
@@ -15,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class WorkoutScreenViewModel @Inject constructor(
-    bleRepository: BleRepository,
+    private val bleRepository: BleRepository,
     savedStateHandle: SavedStateHandle,
 ): ViewModel() {
     private val deviceAddress = savedStateHandle.toRoute<Screen.ActiveWorkout>().macAddress
@@ -23,10 +24,34 @@ class WorkoutScreenViewModel @Inject constructor(
     private val _speed = MutableStateFlow<Double>(0.0)
     val speed = _speed.asStateFlow()
 
+    private val _equipmentType = MutableStateFlow<EquipmentType>(EquipmentType.TREADMILL)
+    val equipmentType = _equipmentType.asStateFlow()
+
     init {
+        bleRepository.discoverCharacteristic(
+            deviceAddress = deviceAddress,
+            onEquipmentCharacteristicFound = { equipmentType ->
+                _equipmentType.value = equipmentType
+            },
+            onFinished = {
+                val characteristic = when(_equipmentType.value) {
+                    EquipmentType.TREADMILL -> UUID.fromString(FTMSConstants.TREADMILL_CHARACTERISTIC)
+                    EquipmentType.BIKE -> TODO()
+                    EquipmentType.STAIR_MASTER -> TODO()
+                }
+
+                subscribeToCharacteristic(deviceAddress, characteristic)
+            }
+        )
+    }
+
+    private fun subscribeToCharacteristic(
+        deviceAddress: String,
+        characteristicUUID: UUID
+    ) {
         bleRepository.connectAndSubscribeToCharacteristic(
             deviceAddress = deviceAddress,
-            characteristic = UUID.fromString(FTMSConstants.TREADMILL_CHARACTERISTIC),
+            characteristic = characteristicUUID,
             onBytesReceived = { bytes ->
                 val flags = ValueInterpreter.getIntValue(
                     bytes,
