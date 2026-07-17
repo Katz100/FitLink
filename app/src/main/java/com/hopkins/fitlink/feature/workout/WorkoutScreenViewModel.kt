@@ -10,6 +10,7 @@ import com.hopkins.fitlink.core.ftms.FTMSConstants
 import com.hopkins.fitlink.nav.Screen
 import com.polidea.rxandroidble3.helpers.ValueInterpreter
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.util.UUID
@@ -21,6 +22,8 @@ class WorkoutScreenViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
 ): ViewModel() {
     private val deviceAddress = savedStateHandle.toRoute<Screen.ActiveWorkout>().macAddress
+
+    private val workoutDisposable = CompositeDisposable()
 
     private val _speed = MutableStateFlow<Double>(0.0)
     val speed = _speed.asStateFlow()
@@ -49,6 +52,9 @@ class WorkoutScreenViewModel @Inject constructor(
         )
     }
 
+    fun updateSpeed() {
+        bleRepository.setSpeed(500.0, deviceAddress)
+    }
     private fun subscribeToCharacteristic(
         deviceAddress: String,
         characteristicUUID: UUID

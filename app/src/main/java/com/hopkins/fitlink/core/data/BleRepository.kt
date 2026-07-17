@@ -52,6 +52,11 @@ interface BleRepository {
         onFinished: () -> Unit,
     )
 
+    fun setSpeed(
+        speedInKph: Double,
+        deviceAddress: String
+    )
+
     fun isBleEnabled(): Boolean
 }
 

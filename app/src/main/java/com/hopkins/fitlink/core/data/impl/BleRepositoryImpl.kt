@@ -11,6 +11,7 @@ import com.polidea.rxandroidble3.RxBleClient
 import com.polidea.rxandroidble3.RxBleDevice
 import com.polidea.rxandroidble3.scan.ScanFilter
 import com.polidea.rxandroidble3.scan.ScanSettings
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.flowOf
@@ -23,7 +24,7 @@ import javax.inject.Inject
 
 class BleRepositoryImpl @Inject constructor(
     private val rxBleClient: RxBleClient
-): BleRepository {
+) : BleRepository {
     companion object {
         const val TAG = "BleRepository"
         const val TIMEOUT = 10L
@@ -124,7 +125,7 @@ class BleRepositoryImpl @Inject constructor(
 
         val device = rxBleClient.getBleDevice(deviceAddress)
 
-         connectDisposable = device.establishConnection(false)
+        connectDisposable = device.establishConnection(false)
             .flatMapSingle { connection ->
                 connection.discoverServices()
             }.map { services ->
@@ -134,11 +135,11 @@ class BleRepositoryImpl @Inject constructor(
                     ?.characteristics
                     ?: emptyList()
             }
-             .doFinally {
-                 Timber.tag(TAG).i("Finished discovering characteristics")
-                 connectDisposable = null
-                 onFinished()
-             }
+            .doFinally {
+                Timber.tag(TAG).i("Finished discovering characteristics")
+                connectDisposable = null
+                onFinished()
+            }
             .subscribe(
                 { characteristic ->
                     characteristic.forEach { ch ->
@@ -158,6 +159,74 @@ class BleRepositoryImpl @Inject constructor(
             )
     }
 
+    override fun setSpeed(speedInKph: Double, deviceAddress: String) {
+        val bytesToWrite = byteArrayOf(
+            0x02.toByte(),
+            (500 and 0xFF).toByte(),
+            ((500 shr 8) and 0xFF).toByte()
+        )
+        writeToControlPoint(
+            deviceAddress = deviceAddress,
+            onConfirmed = {
+                connectDisposable?.dispose()
+                val device = rxBleClient.getBleDevice(deviceAddress)
+                connectDisposable = device.establishConnection(false)
+                    .flatMapSingle { connection ->
+                        connection.writeCharacteristic(
+                            UUID.fromString(FTMSConstants.FITNESS_MACHINE_CONTROL_POINT_UUID),
+                            bytesToWrite
+                        )
+                    }
+                    .subscribe(
+                        { value ->
+                            Timber.tag(TAG).i("Changed speed, received: $value")
+                        },
+
+                        { t ->
+                            Timber.tag(TAG).e("Error changing speed: $t")
+                        }
+                    )
+            },
+            onError = {}
+        )
+    }
+
+    private fun writeToControlPoint(
+        deviceAddress: String,
+        onConfirmed: (ByteArray) -> Unit,
+        onError: () -> Unit,
+    ) {
+        val device = rxBleClient.getBleDevice(deviceAddress)
+
+        val bytesToWrite = byteArrayOf(
+            0x00.toByte()
+        )
+        val disposable: CompositeDisposable = CompositeDisposable()
+
+        connectDisposable?.dispose()
+        connectDisposable = device.establishConnection(false)
+            .flatMapSingle { connection ->
+                connection.writeCharacteristic(
+                    UUID.fromString(FTMSConstants.FITNESS_MACHINE_CONTROL_POINT_UUID),
+                    bytesToWrite
+                )
+            }
+            .subscribe(
+                { value ->
+                    Timber.tag(TAG).i("Writing to CPUUID confirmed: $value")
+                    if (value.contains((0x80 and 0xFF).toByte()) || value.contains(0x01.toByte())) {
+                        onConfirmed(bytesToWrite)
+                    } else {
+                        Timber.tag(TAG).i("Value does not contain 0x80")
+                    }
+                },
+                { t ->
+                    Timber.tag(TAG).e("Error writing to CPUUID: $t")
+                    onError()
+                }
+            )
+    }
+
     override fun isBleEnabled(): Boolean {
         val state = rxBleClient.state
         return state != RxBleClient.State.BLUETOOTH_NOT_ENABLED
@@ -171,7 +240,7 @@ class BleRepositoryImpl @Inject constructor(
 
 class BleRepositoryFake(
     private val scope: CoroutineScope
-): BleRepository {
+) : BleRepository {
 
     var isBleOn: Boolean = true
     private val deviceName = "TestDevice"
@@ -191,7 +260,7 @@ class BleRepositoryFake(
                 }
                 .collect { device ->
                     onDeviceScanned(device)
-            }
+                }
         }
     }
 
@@ -213,6 +282,10 @@ class BleRepositoryFake(
         onEquipmentCharacteristicFound: (EquipmentType) -> Unit,
         onFinished: () -> Unit
     ) {
+        TODO("Not yet implemented")
+    }
+
+    override fun setSpeed(speedInKph: Double, deviceAddress: String) {
         TODO("Not yet implemented")
     }
 
