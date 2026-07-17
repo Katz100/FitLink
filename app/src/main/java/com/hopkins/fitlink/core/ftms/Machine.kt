@@ -116,3 +116,11 @@ data class TreadmillData(
     val forceOnBelt: Int?,
     val powerOutput: Int?
 )
+
+fun createMachine(equipmentType: EquipmentType): Machine<*> {
+    return when (equipmentType) {
+        EquipmentType.TREADMILL -> Treadmill()
+        EquipmentType.BIKE -> TODO()
+        EquipmentType.STAIR_MASTER -> TODO()
+    }
+}

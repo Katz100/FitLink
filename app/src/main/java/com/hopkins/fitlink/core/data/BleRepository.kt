@@ -42,12 +42,12 @@ interface BleRepository {
 
     /**
      * Discovers characteristics for a device
-     * @param device The device you want to find characteristics for
+     * @param deviceAddress The device you want to find characteristics for
      * @param onEquipmentCharacteristicFound A lambda that is called when a characteristic is found
      * @param onFinished A lambda that is called when every characteristic is found for FTMS-supported device
      */
     fun discoverCharacteristic(
-        device: RxBleDevice,
+        deviceAddress: String,
         onEquipmentCharacteristicFound: (EquipmentType) -> Unit,
         onFinished: () -> Unit,
     )

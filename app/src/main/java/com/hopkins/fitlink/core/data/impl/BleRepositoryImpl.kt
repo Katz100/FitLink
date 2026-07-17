@@ -115,12 +115,14 @@ class BleRepositoryImpl @Inject constructor(
     }
 
     override fun discoverCharacteristic(
-        device: RxBleDevice,
+        deviceAddress: String,
         onEquipmentCharacteristicFound: (EquipmentType) -> Unit,
         onFinished: () -> Unit,
     ) {
         stopScanning()
         connectDisposable?.dispose()
+
+        val device = rxBleClient.getBleDevice(deviceAddress)
 
          connectDisposable = device.establishConnection(false)
             .flatMapSingle { connection ->
@@ -205,7 +207,7 @@ class BleRepositoryFake(
     }
 
     override fun discoverCharacteristic(
-        device: RxBleDevice,
+        deviceAddress: String,
         onEquipmentCharacteristicFound: (EquipmentType) -> Unit,
         onFinished: () -> Unit
     ) {
