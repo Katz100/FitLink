@@ -16,12 +16,18 @@ fun WorkoutScreen(
     viewModel: WorkoutScreenViewModel = hiltViewModel()
 ) {
     val speed = viewModel.speed.collectAsStateWithLifecycle().value
+    val equipmentType = viewModel.equipmentType.collectAsStateWithLifecycle().value
+    val notificationStatus = viewModel.notificationStatus.collectAsStateWithLifecycle().value
+    val connectionState = viewModel.connectionState.collectAsStateWithLifecycle().value
 
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        Text(notificationStatus.toString())
+        Text(equipmentType.toString())
+        Text(connectionState.toString())
         Text(speed.toString())
         Button(
             onClick = { viewModel.updateSpeed() }

@@ -34,6 +34,9 @@ class WorkoutScreenViewModel @Inject constructor(
     private val _notificationStatus = MutableStateFlow<NotificationChanged>(NotificationChanged.NotificationLoading)
     val notificationStatus = _notificationStatus.asStateFlow()
 
+    private val _connectionState = MutableStateFlow<ConnectionStatus>(ConnectionStatus.ConnectionLoading)
+    val connectionState = _connectionState.asStateFlow()
+
     init {
         connectToDevice()
     }
@@ -42,6 +45,7 @@ class WorkoutScreenViewModel @Inject constructor(
         bleRepository.connectToDevice(
             deviceAddress = deviceAddress,
             connectionStatusChanged = {
+                _connectionState.value = it
                 if (it is ConnectionStatus.Connected) {
                     discoverCharacteristics()
                 }
