@@ -158,8 +158,6 @@ class BleRepositoryImpl @Inject constructor(
 
         val treadmillCharacteristicUuid = UUID.fromString(FTMSConstants.TREADMILL_CHARACTERISTIC)
 
-        val controlPointUuid = UUID.fromString(FTMSConstants.FITNESS_MACHINE_CONTROL_POINT_UUID)
-
         val disposable = connection
             .discoverServices()
             .map { services ->
@@ -183,9 +181,6 @@ class BleRepositoryImpl @Inject constructor(
                                 onEquipmentCharacteristicFound(
                                     EquipmentType.TREADMILL
                                 )
-                            }
-                            controlPointUuid -> {
-                                Timber.tag(TAG).i("Found control point characteristic")
                             }
                             else -> {
                                 Timber.tag(TAG).i("Found: ${characteristic.uuid}")
@@ -213,6 +208,12 @@ class BleRepositoryImpl @Inject constructor(
                 UUID.fromString(FTMSConstants.FITNESS_MACHINE_CONTROL_POINT_UUID),
                 byteArrayOf(FTMSConstants.REQUEST_CONTROL_POINT.toByte())
             )
+            .doOnSuccess {bytes ->
+                val hex = bytes.joinToString(separator = " ") { byte ->
+                    "%02X".format(byte.toInt() and 0xFF)
+                }
+                Timber.tag(TAG).i("Successful response from control point: $hex")
+            }
             .subscribe(
                 { bytes ->
                     val hex = bytes.joinToString(separator = " ") { byte ->
