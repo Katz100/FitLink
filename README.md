@@ -1,6 +1,6 @@
 # FitLink
 
-An Android application for connecting to your FTMS-supported fitness equipment.
+An Android application for connecting to your FTMS-supported fitness equipment. Uses [RxAndroidBle](https://github.com/dariuszseweryn/RxAndroidBle) for scanning and connecting to ble devices.
 
 ## General project structure
 
