@@ -2,6 +2,7 @@ package com.hopkins.fitlink.core.data
 
 import com.hopkins.fitlink.core.ftms.EquipmentType
 import com.polidea.rxandroidble3.RxBleDevice
+import io.reactivex.rxjava3.disposables.Disposable
 import java.util.UUID
 
 interface BleRepository {
@@ -37,7 +38,8 @@ interface BleRepository {
     )
 
     fun connectToDevice(
-        device: RxBleDevice,
+        deviceAddress: String,
+        connectionStatusChanged: (ConnectionStatus) -> Unit,
     )
 
     /**
@@ -67,6 +69,12 @@ sealed interface NotificationChanged {
     data class NotificationError(val e: Throwable): NotificationChanged
 }
 
+sealed interface ConnectionStatus {
+    data object Disconnected: ConnectionStatus
+    data object ConnectionLoading: ConnectionStatus
+    data object Connected: ConnectionStatus
+    data class ConnectionError(val e: Throwable): ConnectionStatus
+}
 data class BleDevice(
     val name: String,
     val macAddress: String,

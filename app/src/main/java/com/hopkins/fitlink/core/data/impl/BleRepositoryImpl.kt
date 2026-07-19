@@ -3,12 +3,13 @@ package com.hopkins.fitlink.core.data.impl
 import android.os.ParcelUuid
 import com.hopkins.fitlink.core.data.BleDevice
 import com.hopkins.fitlink.core.data.BleRepository
+import com.hopkins.fitlink.core.data.ConnectionStatus
 import com.hopkins.fitlink.core.data.NotificationChanged
 import com.hopkins.fitlink.core.data.toBleDevice
 import com.hopkins.fitlink.core.ftms.EquipmentType
 import com.hopkins.fitlink.core.ftms.FTMSConstants
 import com.polidea.rxandroidble3.RxBleClient
-import com.polidea.rxandroidble3.RxBleDevice
+import com.polidea.rxandroidble3.RxBleConnection
 import com.polidea.rxandroidble3.scan.ScanFilter
 import com.polidea.rxandroidble3.scan.ScanSettings
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -32,6 +33,8 @@ class BleRepositoryImpl @Inject constructor(
 
     private var scanDisposable: Disposable? = null
     private var connectDisposable: Disposable? = null
+    private var activeConnection: RxBleConnection? = null
+    private val operationDisposables = CompositeDisposable()
 
     override fun scanDevices(
         onDeviceScanned: (BleDevice) -> Unit,
@@ -76,13 +79,13 @@ class BleRepositoryImpl @Inject constructor(
         onNotificationChanged: (NotificationChanged) -> Unit,
     ) {
         stopScanning()
-        connectDisposable?.dispose()
-        val device = rxBleClient.getBleDevice(deviceAddress)
 
-        connectDisposable = device.establishConnection(false)
-            .flatMap { connection ->
-                connection.setupNotification(characteristic)
-            }
+        val connection = activeConnection ?: run {
+            Timber.tag(TAG).e("No active BLE connection")
+            return
+        }
+
+        val disposable = connection.setupNotification(characteristic)
             .doOnNext {
                 Timber.tag(TAG).i("Notification set up")
                 onNotificationChanged(NotificationChanged.NotificationCreated)
@@ -91,7 +94,6 @@ class BleRepositoryImpl @Inject constructor(
                 stream
             }
             .doFinally {
-                connectDisposable = null
                 Timber.tag(TAG).i("Connection / notification stream ended")
                 onNotificationChanged(NotificationChanged.NotificationEnded)
             }
@@ -109,10 +111,36 @@ class BleRepositoryImpl @Inject constructor(
                     onNotificationChanged(NotificationChanged.NotificationError(e))
                 }
             )
+        operationDisposables.add(disposable)
     }
 
-    override fun connectToDevice(device: RxBleDevice) {
-        TODO("Not yet implemented")
+    override fun connectToDevice(
+        deviceAddress: String,
+        connectionStatusChanged: (ConnectionStatus) -> Unit
+    ) {
+        stopScanning()
+        val device = rxBleClient.getBleDevice(deviceAddress)
+
+        connectDisposable?.dispose()
+        activeConnection = null
+
+        connectDisposable = device.establishConnection(false)
+            .doFinally {
+                activeConnection = null
+                connectDisposable = null
+                connectionStatusChanged(ConnectionStatus.Disconnected)
+            }
+            .subscribe(
+                {
+                    activeConnection = it
+                    Timber.tag(TAG).i("Connected to $device")
+                    connectionStatusChanged(ConnectionStatus.Connected)
+                },
+                {
+                    Timber.tag(TAG).i("Error connecting to $deviceAddress: $it")
+                    connectionStatusChanged(ConnectionStatus.ConnectionError(it))
+                }
+            )
     }
 
     override fun discoverCharacteristic(
@@ -120,43 +148,54 @@ class BleRepositoryImpl @Inject constructor(
         onEquipmentCharacteristicFound: (EquipmentType) -> Unit,
         onFinished: () -> Unit,
     ) {
-        stopScanning()
-        connectDisposable?.dispose()
+        val connection = activeConnection ?: run {
+            Timber.tag(TAG).e("No active BLE connection")
+            return
+        }
 
-        val device = rxBleClient.getBleDevice(deviceAddress)
+        val ftmsServiceUuid =
+            UUID.fromString(FTMSConstants.FTMS_MACHINE)
 
-        connectDisposable = device.establishConnection(false)
-            .flatMapSingle { connection ->
-                connection.discoverServices()
-            }.map { services ->
-                services.bluetoothGattServices.firstOrNull {
-                    it.uuid == UUID.fromString(FTMSConstants.FTMS_MACHINE)
-                }
+        val treadmillCharacteristicUuid =
+            UUID.fromString(FTMSConstants.TREADMILL_CHARACTERISTIC)
+
+        val disposable = connection
+            .discoverServices()
+            .map { services ->
+                services.bluetoothGattServices
+                    .firstOrNull { service ->
+                        service.uuid == ftmsServiceUuid
+                    }
                     ?.characteristics
-                    ?: emptyList()
+                    .orEmpty()
             }
             .doFinally {
-                Timber.tag(TAG).i("Finished discovering characteristics")
-                connectDisposable = null
-                onFinished()
+                Timber.tag(TAG).i("Characteristic discovery operation ended")
             }
             .subscribe(
-                { characteristic ->
-                    characteristic.forEach { ch ->
-                        if (ch.uuid == UUID.fromString(FTMSConstants.TREADMILL_CHARACTERISTIC)) {
-                            Timber.tag(TAG).i("Found Treadmill Characteristic")
-                            onEquipmentCharacteristicFound(EquipmentType.TREADMILL)
-                        } else {
-                            Timber.tag(TAG).i("Found: ${ch.uuid}")
+                { characteristics ->
+                    characteristics.forEach { characteristic ->
+                        when (characteristic.uuid) {
+                            treadmillCharacteristicUuid -> {
+                                Timber.tag(TAG).i("Found treadmill characteristic")
+                                onEquipmentCharacteristicFound(
+                                    EquipmentType.TREADMILL
+                                )
+                            }
+                            else -> {
+                                Timber.tag(TAG).i("Found: ${characteristic.uuid}")
+                            }
                         }
                     }
-                    connectDisposable?.dispose()
-                    connectDisposable = null
+                    Timber.tag(TAG).i("Finished processing characteristics")
+                    onFinished()
                 },
-                { t ->
-                    Timber.tag(TAG).e("Error getting characteristics: $t")
-                }
+                { error ->
+                    Timber.tag(TAG).e(error, "Error discovering characteristics")
+                },
             )
+
+        operationDisposables.add(disposable)
     }
 
     override fun setSpeed(speedInKph: Double, deviceAddress: String) {
@@ -201,7 +240,6 @@ class BleRepositoryImpl @Inject constructor(
         val bytesToWrite = byteArrayOf(
             0x00.toByte()
         )
-        val disposable: CompositeDisposable = CompositeDisposable()
 
         connectDisposable?.dispose()
         connectDisposable = device.establishConnection(false)
@@ -270,10 +308,13 @@ class BleRepositoryFake(
         onBytesReceived: (ByteArray) -> Unit,
         onNotificationChanged: (NotificationChanged) -> Unit
     ) {
-
+        TODO("")
     }
 
-    override fun connectToDevice(device: RxBleDevice) {
+    override fun connectToDevice(
+        deviceAddress: String,
+        on: (ConnectionStatus) -> Unit
+    ) {
         TODO("Not yet implemented")
     }
 

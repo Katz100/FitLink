@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.navigation.toRoute
 import com.hopkins.fitlink.core.data.BleRepository
+import com.hopkins.fitlink.core.data.ConnectionStatus
 import com.hopkins.fitlink.core.data.NotificationChanged
 import com.hopkins.fitlink.core.ftms.EquipmentType
 import com.hopkins.fitlink.core.ftms.FTMSConstants
@@ -23,7 +24,6 @@ class WorkoutScreenViewModel @Inject constructor(
 ): ViewModel() {
     private val deviceAddress = savedStateHandle.toRoute<Screen.ActiveWorkout>().macAddress
 
-    private val workoutDisposable = CompositeDisposable()
 
     private val _speed = MutableStateFlow<Double>(0.0)
     val speed = _speed.asStateFlow()
@@ -35,6 +35,21 @@ class WorkoutScreenViewModel @Inject constructor(
     val notificationStatus = _notificationStatus.asStateFlow()
 
     init {
+        connectToDevice()
+    }
+
+    private fun connectToDevice() {
+        bleRepository.connectToDevice(
+            deviceAddress = deviceAddress,
+            connectionStatusChanged = {
+                if (it is ConnectionStatus.Connected) {
+                    discoverCharacteristics()
+                }
+            }
+        )
+    }
+
+    private fun discoverCharacteristics() {
         bleRepository.discoverCharacteristic(
             deviceAddress = deviceAddress,
             onEquipmentCharacteristicFound = { equipmentType ->
@@ -51,7 +66,6 @@ class WorkoutScreenViewModel @Inject constructor(
             }
         )
     }
-
     fun updateSpeed() {
         bleRepository.setSpeed(500.0, deviceAddress)
     }
