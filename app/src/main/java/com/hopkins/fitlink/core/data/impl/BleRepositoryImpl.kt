@@ -50,7 +50,7 @@ class BleRepositoryImpl @Inject constructor(
         val parcelUuid: ParcelUuid = ParcelUuid.fromString(FTMSConstants.FTMS_MACHINE)
 
         val scanFilter = ScanFilter.Builder()
-            .setServiceUuid(parcelUuid)
+      //      .setServiceUuid(parcelUuid)
             .build()
 
 
