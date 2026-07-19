@@ -48,6 +48,7 @@ class WorkoutScreenViewModel @Inject constructor(
                 _connectionState.value = it
                 if (it is ConnectionStatus.Connected) {
                     discoverCharacteristics()
+                    bleRepository.writeToControlPoint()
                 }
             }
         )

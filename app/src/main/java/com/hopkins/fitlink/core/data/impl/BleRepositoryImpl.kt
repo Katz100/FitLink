@@ -103,7 +103,7 @@ class BleRepositoryImpl @Inject constructor(
                         "%02X".format(byte.toInt() and 0xFF)
                     }
 
-                    Timber.tag(TAG).i("Received bytes hex: $hex")
+                 //   Timber.tag(TAG).i("Received bytes hex: $hex")
                     onBytesReceived(bytes)
                 },
                 { e ->
@@ -128,6 +128,7 @@ class BleRepositoryImpl @Inject constructor(
             .doFinally {
                 activeConnection = null
                 connectDisposable = null
+                Timber.tag(TAG).i("Disconnected to $device")
                 connectionStatusChanged(ConnectionStatus.Disconnected)
             }
             .subscribe(
@@ -153,11 +154,11 @@ class BleRepositoryImpl @Inject constructor(
             return
         }
 
-        val ftmsServiceUuid =
-            UUID.fromString(FTMSConstants.FTMS_MACHINE)
+        val ftmsServiceUuid = UUID.fromString(FTMSConstants.FTMS_MACHINE)
 
-        val treadmillCharacteristicUuid =
-            UUID.fromString(FTMSConstants.TREADMILL_CHARACTERISTIC)
+        val treadmillCharacteristicUuid = UUID.fromString(FTMSConstants.TREADMILL_CHARACTERISTIC)
+
+        val controlPointUuid = UUID.fromString(FTMSConstants.FITNESS_MACHINE_CONTROL_POINT_UUID)
 
         val disposable = connection
             .discoverServices()
@@ -171,6 +172,7 @@ class BleRepositoryImpl @Inject constructor(
             }
             .doFinally {
                 Timber.tag(TAG).i("Characteristic discovery operation ended")
+                onFinished()
             }
             .subscribe(
                 { characteristics ->
@@ -182,13 +184,15 @@ class BleRepositoryImpl @Inject constructor(
                                     EquipmentType.TREADMILL
                                 )
                             }
+                            controlPointUuid -> {
+                                Timber.tag(TAG).i("Found control point characteristic")
+                            }
                             else -> {
                                 Timber.tag(TAG).i("Found: ${characteristic.uuid}")
                             }
                         }
                     }
                     Timber.tag(TAG).i("Finished processing characteristics")
-                    onFinished()
                 },
                 { error ->
                     Timber.tag(TAG).e(error, "Error discovering characteristics")
@@ -198,71 +202,37 @@ class BleRepositoryImpl @Inject constructor(
         operationDisposables.add(disposable)
     }
 
+    override fun writeToControlPoint() {
+        val connection = activeConnection ?: run {
+            Timber.tag(TAG).e("No active BLE connection")
+            return
+        }
+
+        val disposable = connection
+            .writeCharacteristic(
+                UUID.fromString(FTMSConstants.FITNESS_MACHINE_CONTROL_POINT_UUID),
+                byteArrayOf(FTMSConstants.REQUEST_CONTROL_POINT.toByte())
+            )
+            .subscribe(
+                { bytes ->
+                    val hex = bytes.joinToString(separator = " ") { byte ->
+                        "%02X".format(byte.toInt() and 0xFF)
+                    }
+                    Timber.tag(TAG).i("Response after writing to control point: $hex")
+                },
+                {
+                    Timber.tag(TAG).e("Error writing to control point: $it")
+                }
+            )
+        operationDisposables.add(disposable)
+    }
+
     override fun setSpeed(speedInKph: Double, deviceAddress: String) {
         val bytesToWrite = byteArrayOf(
             0x02.toByte(),
             (500 and 0xFF).toByte(),
             ((500 shr 8) and 0xFF).toByte()
         )
-        writeToControlPoint(
-            deviceAddress = deviceAddress,
-            onConfirmed = {
-                connectDisposable?.dispose()
-                val device = rxBleClient.getBleDevice(deviceAddress)
-                connectDisposable = device.establishConnection(false)
-                    .flatMapSingle { connection ->
-                        connection.writeCharacteristic(
-                            UUID.fromString(FTMSConstants.FITNESS_MACHINE_CONTROL_POINT_UUID),
-                            bytesToWrite
-                        )
-                    }
-                    .subscribe(
-                        { value ->
-                            Timber.tag(TAG).i("Changed speed, received: $value")
-                        },
-
-                        { t ->
-                            Timber.tag(TAG).e("Error changing speed: $t")
-                        }
-                    )
-            },
-            onError = {}
-        )
-    }
-
-    private fun writeToControlPoint(
-        deviceAddress: String,
-        onConfirmed: (ByteArray) -> Unit,
-        onError: () -> Unit,
-    ) {
-        val device = rxBleClient.getBleDevice(deviceAddress)
-
-        val bytesToWrite = byteArrayOf(
-            0x00.toByte()
-        )
-
-        connectDisposable?.dispose()
-        connectDisposable = device.establishConnection(false)
-            .flatMapSingle { connection ->
-                connection.writeCharacteristic(
-                    UUID.fromString(FTMSConstants.FITNESS_MACHINE_CONTROL_POINT_UUID),
-                    bytesToWrite
-                )
-            }
-            .subscribe(
-                { value ->
-                    Timber.tag(TAG).i("Writing to CPUUID confirmed: $value")
-                    if (value.contains((0x80 and 0xFF).toByte()) || value.contains(0x01.toByte())) {
-                        onConfirmed(bytesToWrite)
-                    } else {
-                        Timber.tag(TAG).i("Value does not contain 0x80")
-                    }
-                },
-                { t ->
-                    Timber.tag(TAG).e("Error writing to CPUUID: $t")
-                    onError()
-                }
-            )
     }
 
     override fun isBleEnabled(): Boolean {
@@ -323,6 +293,10 @@ class BleRepositoryFake(
         onEquipmentCharacteristicFound: (EquipmentType) -> Unit,
         onFinished: () -> Unit
     ) {
+        TODO("Not yet implemented")
+    }
+
+    override fun writeToControlPoint() {
         TODO("Not yet implemented")
     }
 

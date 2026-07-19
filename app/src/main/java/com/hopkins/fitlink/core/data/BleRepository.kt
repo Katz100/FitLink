@@ -54,6 +54,8 @@ interface BleRepository {
         onFinished: () -> Unit,
     )
 
+    fun writeToControlPoint()
+
     fun setSpeed(
         speedInKph: Double,
         deviceAddress: String
