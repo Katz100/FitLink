@@ -19,7 +19,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
@@ -61,36 +64,57 @@ fun ControlStepper(
                 Text(unit)
             }
         }
-        FilledIconButton(
-            modifier = Modifier.fillMaxWidth(),
+
+        StepperButton(
+            modifier = Modifier.fillMaxWidth()
+                .shadow(
+                    elevation = 6.dp,
+                    shape = MaterialTheme.shapes.medium,
+                    clip = false
+                ),
             enabled = buttonsEnabled,
-            colors = IconButtonDefaults.iconButtonColors().copy(
-                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
-            ),
             shape = MaterialTheme.shapes.medium,
-            onClick = onIncrementPressed
-        ) {
-            Icon(
-                imageVector = Icons.Default.KeyboardArrowUp,
-                contentDescription = "Increment",
-                tint = Color.Blue,
-            )
-        }
-        FilledIconButton(
-            modifier = Modifier.fillMaxWidth(),
+            imageVector = Icons.Default.KeyboardArrowUp,
+            onPressed = onIncrementPressed
+        )
+
+        StepperButton(
+            modifier = Modifier.fillMaxWidth()
+                .shadow(
+                    elevation = 6.dp,
+                    shape = MaterialTheme.shapes.medium,
+                    clip = false
+                ),
             enabled = buttonsEnabled,
-            colors = IconButtonDefaults.iconButtonColors().copy(
-                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
-            ),
             shape = MaterialTheme.shapes.medium,
-            onClick = onDecrementPressed
-        ) {
-            Icon(
-                imageVector = Icons.Default.KeyboardArrowDown,
-                contentDescription = "Decrement",
-                tint = Color.Blue
-            )
-        }
+            imageVector = Icons.Default.KeyboardArrowDown,
+            onPressed = onDecrementPressed
+        )
+    }
+}
+
+@Composable
+private fun StepperButton(
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    shape: Shape,
+    imageVector: ImageVector,
+    onPressed: () -> Unit = {}
+) {
+    FilledIconButton(
+        modifier = modifier,
+        enabled = enabled,
+        colors = IconButtonDefaults.iconButtonColors().copy(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+        ),
+        shape = shape,
+        onClick = onPressed
+    ) {
+        Icon(
+            imageVector = imageVector,
+            contentDescription = "Step icon",
+            tint = Color.Blue
+        )
     }
 }
 
