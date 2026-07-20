@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -26,6 +27,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -55,7 +57,6 @@ fun ControlStepper(
             value = value,
             unit = unit,
             valueTextStyle = MaterialTheme.typography.headlineMedium
-
         )
 
         StepperButton(
@@ -118,6 +119,7 @@ private fun MetricSummaryCard(
 private fun StepperButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    iconSize: Dp = 42.dp,
     shape: Shape,
     imageVector: ImageVector,
     onPressed: () -> Unit = {}
@@ -132,6 +134,7 @@ private fun StepperButton(
         onClick = onPressed
     ) {
         Icon(
+            modifier = Modifier.size(iconSize),
             imageVector = imageVector,
             contentDescription = "Step icon",
             tint = Color.Blue
