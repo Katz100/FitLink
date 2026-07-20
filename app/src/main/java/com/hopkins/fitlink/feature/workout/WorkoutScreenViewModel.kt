@@ -29,9 +29,6 @@ class WorkoutScreenViewModel @Inject constructor(
     private val deviceAddress = savedStateHandle.toRoute<Screen.ActiveWorkout>().macAddress
     private var machine: Machine<*>? = null
 
-    private val _speed = MutableStateFlow<Double>(0.0)
-    val speed = _speed.asStateFlow()
-
     private val _equipmentType = MutableStateFlow<EquipmentType>(EquipmentType.TREADMILL)
     val equipmentType = _equipmentType.asStateFlow()
 
