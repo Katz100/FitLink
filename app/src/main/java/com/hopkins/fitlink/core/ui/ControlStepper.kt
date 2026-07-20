@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
@@ -23,6 +24,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
@@ -45,25 +47,16 @@ fun ControlStepper(
             .padding(4.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
+        MetricSummaryCard(
+            cardColor = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
-            )
-        ) {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                Text(heading)
-                Text(
-                    text = value,
-                    style = MaterialTheme.typography.headlineMedium
-                )
-                Text(unit)
-            }
-        }
+            ),
+            heading = heading,
+            value = value,
+            unit = unit,
+            valueTextStyle = MaterialTheme.typography.headlineMedium
+
+        )
 
         StepperButton(
             modifier = Modifier.fillMaxWidth()
@@ -90,6 +83,34 @@ fun ControlStepper(
             imageVector = Icons.Default.KeyboardArrowDown,
             onPressed = onDecrementPressed
         )
+    }
+}
+
+@Composable
+private fun MetricSummaryCard(
+    modifier: Modifier = Modifier,
+    cardColor: CardColors,
+    heading: String,
+    value: String,
+    unit: String,
+    valueTextStyle: TextStyle,
+) {
+    Card(
+        modifier = modifier,
+        colors = cardColor
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Text(heading)
+            Text(
+                text = value,
+                style = valueTextStyle
+            )
+            Text(unit)
+        }
     }
 }
 
