@@ -68,31 +68,19 @@ class Treadmill: Machine<TreadmillData>(
     }
 }
 
-/*
-                val flags = ValueInterpreter.getIntValue(
-                    bytes,
-                    ValueInterpreter.FORMAT_UINT16,
-                    0,
-                )?: return@connectAndSubscribeToCharacteristic
-
-                if (hasFlag(0, flags)) return@connectAndSubscribeToCharacteristic
-
-                val instant = ValueInterpreter.getIntValue(
-                    bytes,
-                    ValueInterpreter.FORMAT_UINT16,
-                    2
-                )?: return@connectAndSubscribeToCharacteristic
-
-                val speedKph = instant / 100.0
-                val speedMph = speedKph * 0.621371
-
-                _speed.value = speedMph
- */
-
 enum class EquipmentType {
     TREADMILL,
     BIKE,
     STAIR_MASTER,
+}
+
+sealed interface MachineState {
+    data object DetectingMachine: MachineState
+
+    data class TreadmillMachine(
+        val instantaneousSpeed: Double?,
+        val heartRate: Int?
+    ): MachineState
 }
 
 data class TreadmillData(

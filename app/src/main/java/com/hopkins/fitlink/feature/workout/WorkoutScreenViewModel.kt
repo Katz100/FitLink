@@ -8,10 +8,13 @@ import com.hopkins.fitlink.core.data.ConnectionStatus
 import com.hopkins.fitlink.core.data.NotificationChanged
 import com.hopkins.fitlink.core.ftms.EquipmentType
 import com.hopkins.fitlink.core.ftms.FTMSConstants
+import com.hopkins.fitlink.core.ftms.Machine
+import com.hopkins.fitlink.core.ftms.MachineState
+import com.hopkins.fitlink.core.ftms.MachineState.TreadmillMachine
+import com.hopkins.fitlink.core.ftms.Treadmill
+import com.hopkins.fitlink.core.ftms.createMachine
 import com.hopkins.fitlink.nav.Screen
-import com.polidea.rxandroidble3.helpers.ValueInterpreter
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.rxjava3.disposables.CompositeDisposable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.util.UUID
@@ -22,8 +25,9 @@ class WorkoutScreenViewModel @Inject constructor(
     private val bleRepository: BleRepository,
     savedStateHandle: SavedStateHandle,
 ): ViewModel() {
-    private val deviceAddress = savedStateHandle.toRoute<Screen.ActiveWorkout>().macAddress
 
+    private val deviceAddress = savedStateHandle.toRoute<Screen.ActiveWorkout>().macAddress
+    private var machine: Machine<*>? = null
 
     private val _speed = MutableStateFlow<Double>(0.0)
     val speed = _speed.asStateFlow()
@@ -36,6 +40,9 @@ class WorkoutScreenViewModel @Inject constructor(
 
     private val _connectionState = MutableStateFlow<ConnectionStatus>(ConnectionStatus.ConnectionLoading)
     val connectionState = _connectionState.asStateFlow()
+
+    private val _machineState = MutableStateFlow<MachineState>(MachineState.DetectingMachine)
+    val machineState = _machineState.asStateFlow()
 
     init {
         connectToDevice()
@@ -66,7 +73,7 @@ class WorkoutScreenViewModel @Inject constructor(
                     EquipmentType.BIKE -> TODO()
                     EquipmentType.STAIR_MASTER -> TODO()
                 }
-
+                machine = createMachine(_equipmentType.value)
                 subscribeToCharacteristic(deviceAddress, characteristic)
             }
         )
@@ -82,24 +89,18 @@ class WorkoutScreenViewModel @Inject constructor(
             deviceAddress = deviceAddress,
             characteristic = characteristicUUID,
             onBytesReceived = { bytes ->
-                val flags = ValueInterpreter.getIntValue(
-                    bytes,
-                    ValueInterpreter.FORMAT_UINT16,
-                    0,
-                )?: return@connectAndSubscribeToCharacteristic
+                val currentMachine = machine ?: return@connectAndSubscribeToCharacteristic
+                currentMachine.parseDataForMachine(bytes)
 
-                if (hasFlag(0, flags)) return@connectAndSubscribeToCharacteristic
-
-                val instant = ValueInterpreter.getIntValue(
-                    bytes,
-                    ValueInterpreter.FORMAT_UINT16,
-                    2
-                )?: return@connectAndSubscribeToCharacteristic
-
-                val speedKph = instant / 100.0
-                val speedMph = speedKph * 0.621371
-
-                _speed.value = speedMph
+                _machineState.value = when(currentMachine) {
+                    is Treadmill -> {
+                        TreadmillMachine(
+                            instantaneousSpeed = currentMachine.machineData?.instantaneousSpeed,
+                            heartRate = currentMachine.machineData?.heartRate
+                        )
+                    }
+                    else -> return@connectAndSubscribeToCharacteristic
+                }
             },
             onNotificationChanged = { notification ->
                 _notificationStatus.value = notification

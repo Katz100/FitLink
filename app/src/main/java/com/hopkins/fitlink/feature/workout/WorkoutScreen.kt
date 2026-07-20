@@ -11,11 +11,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.hopkins.fitlink.core.ui.ControlStepper
-import kotlin.math.roundToLong
+import com.hopkins.fitlink.core.ui.WorkoutView
 
 @Composable
 fun WorkoutScreen(
@@ -25,6 +23,7 @@ fun WorkoutScreen(
     val equipmentType = viewModel.equipmentType.collectAsStateWithLifecycle().value
     val notificationStatus = viewModel.notificationStatus.collectAsStateWithLifecycle().value
     val connectionState = viewModel.connectionState.collectAsStateWithLifecycle().value
+    val machineState = viewModel.machineState.collectAsStateWithLifecycle().value
 
     Scaffold(
         modifier = Modifier.fillMaxSize()
@@ -38,12 +37,7 @@ fun WorkoutScreen(
             Text(notificationStatus.toString())
             Text(equipmentType.toString())
             Text(connectionState.toString())
-            ControlStepper(
-                value = speed.toString().format("%.1f"),
-                modifier = Modifier.width(98.dp),
-                heading = "Speed",
-                unit = "MPH"
-            )
+            WorkoutView(machineState)
             Button(
                 onClick = { viewModel.updateSpeed() }
             ) {

@@ -50,7 +50,7 @@ class BleRepositoryImpl @Inject constructor(
         val parcelUuid: ParcelUuid = ParcelUuid.fromString(FTMSConstants.FTMS_MACHINE)
 
         val scanFilter = ScanFilter.Builder()
-      //      .setServiceUuid(parcelUuid)
+            .setServiceUuid(parcelUuid)
             .build()
 
 
@@ -122,6 +122,7 @@ class BleRepositoryImpl @Inject constructor(
         val device = rxBleClient.getBleDevice(deviceAddress)
 
         connectDisposable?.dispose()
+        operationDisposables.clear()
         activeConnection = null
 
         connectDisposable = device.establishConnection(false)
@@ -131,13 +132,16 @@ class BleRepositoryImpl @Inject constructor(
                 Timber.tag(TAG).i("Disconnected to $device")
                 connectionStatusChanged(ConnectionStatus.Disconnected)
             }
+            .doOnNext {
+                Timber.tag(TAG).i("Connected to $device")
+                activeConnection = it
+                connectionStatusChanged(ConnectionStatus.Connected)
+            }
             .subscribe(
                 {
-                    activeConnection = it
-                    Timber.tag(TAG).i("Connected to $device")
-                    connectionStatusChanged(ConnectionStatus.Connected)
                 },
                 {
+                    activeConnection = null
                     Timber.tag(TAG).i("Error connecting to $deviceAddress: $it")
                     connectionStatusChanged(ConnectionStatus.ConnectionError(it))
                 }
