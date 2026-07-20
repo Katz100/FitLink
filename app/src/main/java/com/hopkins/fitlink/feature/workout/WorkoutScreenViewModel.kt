@@ -89,25 +89,31 @@ class WorkoutScreenViewModel @Inject constructor(
             deviceAddress = deviceAddress,
             characteristic = characteristicUUID,
             onBytesReceived = { bytes ->
-                val currentMachine = machine ?: return@connectAndSubscribeToCharacteristic
-                currentMachine.parseDataForMachine(bytes)
-
-                _machineState.value = when(currentMachine) {
-                    is Treadmill -> {
-                        TreadmillMachine(
-                            instantaneousSpeed = currentMachine.machineData?.instantaneousSpeed,
-                            heartRate = currentMachine.machineData?.heartRate
-                        )
-                    }
-                    else -> return@connectAndSubscribeToCharacteristic
-                }
+                updateMachineState(bytes)
             },
             onNotificationChanged = { notification ->
                 _notificationStatus.value = notification
             }
         )
     }
+
+    private fun updateMachineState(bytes: ByteArray) {
+        val currentMachine = machine ?: return
+        currentMachine.parseDataForMachine(bytes)
+
+        _machineState.value = when(currentMachine) {
+            is Treadmill -> {
+                TreadmillMachine(
+                    instantaneousSpeed = currentMachine.machineData?.instantaneousSpeed,
+                    heartRate = currentMachine.machineData?.heartRate
+                )
+            }
+            else -> return
+        }
+    }
 }
+
+
 
 fun hasFlag(bit: Int, flags: Int): Boolean {
     return flags and (1 shl bit) != 0
