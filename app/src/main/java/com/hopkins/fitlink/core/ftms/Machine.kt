@@ -1,6 +1,7 @@
 package com.hopkins.fitlink.core.ftms
 
 import com.polidea.rxandroidble3.helpers.ValueInterpreter
+import timber.log.Timber
 
 abstract class Machine<Data>(
 ) {
@@ -13,24 +14,24 @@ class Treadmill: Machine<TreadmillData>(
 ) {
     override var machineData: TreadmillData? = TreadmillData(
         moreData = false,
-        instantaneousSpeed = 0.0,
-        averageSpeed = 0.0,
-        totalDistance = 0,
-        inclination = 0.0,
-        rampAngleSetting = 0.0,
-        positiveElevationGain = 0,
-        negativeElevationGain = 0,
-        instantaneousPace = 0.0,
-        averagePace = 0.0,
-        totalEnergy = 0.0,
-        energyPerHour = 0,
-        energyPerMinute = 0,
-        heartRate = 0,
-        metabolicEquivalent = 0.0,
-        elapsedTime = 0,
-        remainingTime = 0,
-        forceOnBelt = 0,
-        powerOutput = 0
+        instantaneousSpeed = null,
+        averageSpeed = null,
+        totalDistance = null,
+        inclination = null,
+        rampAngleSetting = null,
+        positiveElevationGain = null,
+        negativeElevationGain = null,
+        instantaneousPace = null,
+        averagePace = null,
+        totalEnergy = null,
+        energyPerHour = null,
+        energyPerMinute = null,
+        heartRate = null,
+        metabolicEquivalent = null,
+        elapsedTime = null,
+        remainingTime = null,
+        forceOnBelt = null,
+        powerOutput = null
     )
 
     override fun parseDataForMachine(bytes: ByteArray) {
@@ -101,7 +102,12 @@ class Treadmill: Machine<TreadmillData>(
                 offset
             ) ?: return
 
-            inclinationPercent = rawInclination * 0.1
+            inclinationPercent =
+                if (rawInclination == Short.MAX_VALUE.toInt()) {
+                    null
+                } else {
+                    rawInclination * 0.1
+                }
             offset += 2
 
             val rawRampAngle = ValueInterpreter.getIntValue(
@@ -112,7 +118,7 @@ class Treadmill: Machine<TreadmillData>(
 
             inclinationAngle =
                 if (rawRampAngle == Short.MAX_VALUE.toInt()) {
-                    0.0
+                    null
                 } else {
                     rawRampAngle * 0.1
                 }
@@ -228,7 +234,7 @@ class Treadmill: Machine<TreadmillData>(
 
             forceOnBeltNewtons =
                 if (rawForceOnBelt == Short.MAX_VALUE.toInt()) {
-                    0.0
+                    null
                 } else {
                     rawForceOnBelt.toDouble()
                 }
@@ -243,13 +249,38 @@ class Treadmill: Machine<TreadmillData>(
 
             powerOutputWatts =
                 if (rawPowerOutput == Short.MAX_VALUE.toInt()) {
-                    0.0
+                    null
                 } else {
                     rawPowerOutput.toDouble()
                 }
 
             offset += 2
         }
+
+        Timber.tag("Machine").i(
+            """
+        Parsed machine data:
+        flags=$flags
+        instantaneousSpeedMph=$speedMph
+        averageSpeedMph=$averageSpeed
+        totalDistance=$totalDistance
+        inclinationPercent=$inclinationPercent
+        inclinationAngle=$inclinationAngle
+        positiveElevationGain=$positiveGain
+        negativeElevationGain=$negativeGain
+        instantaneousPace=$instantPace
+        averagePace=$averagePace
+        totalEnergyKcal=$totalEnergyKcal
+        energyPerHourKcal=$energyPerHourKcal
+        energyPerMinuteKcal=$energyPerMinuteKcal
+        heartRateBpm=$heartRateBpm
+        metabolicEquivalent=$metabolicEquivalent
+        elapsedTimeSeconds=$elapsedTimeSeconds
+        remainingTimeSeconds=$remainingTimeSeconds
+        forceOnBeltNewtons=$forceOnBeltNewtons
+        powerOutputWatts=$powerOutputWatts
+        """.trimIndent()
+        )
 
         machineData = machineData?.let { current ->
             current.copy(
