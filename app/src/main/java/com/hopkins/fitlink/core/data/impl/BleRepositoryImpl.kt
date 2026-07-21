@@ -103,7 +103,7 @@ class BleRepositoryImpl @Inject constructor(
                         "%02X".format(byte.toInt() and 0xFF)
                     }
 
-                 //   Timber.tag(TAG).i("Received bytes hex: $hex")
+                    //   Timber.tag(TAG).i("Received bytes hex: $hex")
                     onBytesReceived(bytes)
                 },
                 { e ->
@@ -208,26 +208,22 @@ class BleRepositoryImpl @Inject constructor(
         }
 
         val disposable = connection
-            .writeCharacteristic(
-                UUID.fromString(FTMSConstants.FITNESS_MACHINE_CONTROL_POINT_UUID),
-                byteArrayOf(FTMSConstants.REQUEST_CONTROL_POINT.toByte())
-            )
-            .doOnSuccess {bytes ->
-                val hex = bytes.joinToString(separator = " ") { byte ->
-                    "%02X".format(byte.toInt() and 0xFF)
-                }
-                Timber.tag(TAG).i("Successful response from control point: $hex")
+            .setupIndication(UUID.fromString(FTMSConstants.FITNESS_MACHINE_CONTROL_POINT_UUID))
+            .doOnNext {
+                Timber.tag(TAG).i("Indication set up for control point")
             }
+            .flatMap { it }
             .subscribe(
                 { bytes ->
                     val hex = bytes.joinToString(separator = " ") { byte ->
                         "%02X".format(byte.toInt() and 0xFF)
                     }
-                    Timber.tag(TAG).i("Response after writing to control point: $hex")
+                    Timber.tag(TAG).i("Successful response from control point: $hex")
                 },
                 {
                     Timber.tag(TAG).e("Error writing to control point: $it")
                 }
+
             )
         operationDisposables.add(disposable)
     }

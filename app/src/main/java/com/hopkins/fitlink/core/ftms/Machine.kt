@@ -1,6 +1,5 @@
 package com.hopkins.fitlink.core.ftms
 
-import com.hopkins.fitlink.feature.workout.hasFlag
 import com.polidea.rxandroidble3.helpers.ValueInterpreter
 
 abstract class Machine<Data>(
@@ -288,6 +287,9 @@ private fun getUInt24(
             ((bytes[offset + 2].toInt() and 0xFF) shl 16)
 }
 
+fun hasFlag(bit: Int, flags: Int): Boolean {
+    return flags and (1 shl bit) != 0
+}
 enum class EquipmentType {
     TREADMILL,
     BIKE,
@@ -302,6 +304,7 @@ sealed interface MachineState {
         val heartRate: Int?,
         val distance: Double = 0.0,
         val totalDistance: Int? = 0,
+        val inclination: Double? = 0.0
     ): MachineState
 }
 

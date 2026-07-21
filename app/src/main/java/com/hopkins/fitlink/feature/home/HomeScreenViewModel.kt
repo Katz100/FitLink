@@ -23,6 +23,7 @@ class HomeScreenViewModel @Inject constructor(
 
     fun scanForDevices() {
         _scanning.value = true
+        clearDevices()
         bleRepository.scanDevices(
             onDeviceScanned = { device ->
                 if (!_devices.value.contains(device)) {

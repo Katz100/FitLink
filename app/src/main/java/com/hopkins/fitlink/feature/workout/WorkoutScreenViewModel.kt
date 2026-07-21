@@ -52,7 +52,7 @@ class WorkoutScreenViewModel @Inject constructor(
                 _connectionState.value = it
                 if (it is ConnectionStatus.Connected) {
                     discoverCharacteristics()
-                    bleRepository.writeToControlPoint()
+                 //   bleRepository.writeToControlPoint()
                 }
             }
         )
@@ -102,7 +102,8 @@ class WorkoutScreenViewModel @Inject constructor(
             is Treadmill -> {
                 TreadmillMachine(
                     instantaneousSpeed = currentMachine.machineData?.instantaneousSpeed,
-                    heartRate = currentMachine.machineData?.heartRate
+                    heartRate = currentMachine.machineData?.heartRate,
+                    inclination = currentMachine.machineData?.inclination
                 )
             }
             else -> return
@@ -110,8 +111,3 @@ class WorkoutScreenViewModel @Inject constructor(
     }
 }
 
-
-
-fun hasFlag(bit: Int, flags: Int): Boolean {
-    return flags and (1 shl bit) != 0
-}
