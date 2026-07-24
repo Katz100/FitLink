@@ -37,6 +37,9 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
+    }
     buildFeatures {
         compose = true
     }
@@ -88,4 +91,11 @@ dependencies {
     kaptTest("com.google.dagger:hilt-android-compiler:$hiltVersion")
     kaptAndroidTest("com.google.dagger:hilt-android-compiler:$hiltVersion")
     testImplementation(kotlin("test"))
+
+    // testing
+    testImplementation (libs.junit.v412)
+    testImplementation (libs.androidx.core)
+    testImplementation (libs.robolectric)
+    testImplementation (libs.mockclient)
+    testImplementation (libs.mockito.core)
 }
