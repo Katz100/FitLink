@@ -65,7 +65,7 @@ dependencies {
 
     implementation ("com.polidea.rxandroidble3:rxandroidble:1.19.1")
 
-    testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.11.0")
+    testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
 
     val nav_version = "2.9.8"
 
@@ -93,6 +93,7 @@ dependencies {
     testImplementation(kotlin("test"))
 
     // testing
+    testImplementation("com.polidea.rxandroidble3:mockclient:1.19.1")
     testImplementation (libs.junit.v412)
     testImplementation (libs.androidx.core)
     testImplementation (libs.robolectric)

@@ -12,7 +12,7 @@ activityCompose = "1.10.1"
 composeBom = "2025.04.01"
 mockclient = "1.10.5"
 mockitoCore = "2.19.0"
-robolectric = "4.3.1"
+robolectric = "4.14.1"
 
 [libraries]
 androidx-core = { module = "androidx.test:core", version.ref = "core" }
