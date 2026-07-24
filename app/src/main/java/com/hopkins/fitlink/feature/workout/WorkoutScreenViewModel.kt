@@ -16,9 +16,18 @@ import com.hopkins.fitlink.core.ftms.createMachine
 import com.hopkins.fitlink.nav.Screen
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import java.util.UUID
 import javax.inject.Inject
+
+data class WorkoutUiState(
+    val equipmentType: EquipmentType = EquipmentType.TREADMILL,
+    val notificationStatus: NotificationChanged = NotificationChanged.NotificationLoading,
+    val connectionState: ConnectionStatus = ConnectionStatus.ConnectionLoading,
+    val machineUiState: MachineState = MachineState.DetectingMachine
+)
 
 @HiltViewModel
 class WorkoutScreenViewModel @Inject constructor(
@@ -29,17 +38,8 @@ class WorkoutScreenViewModel @Inject constructor(
     private val deviceAddress = savedStateHandle.toRoute<Screen.ActiveWorkout>().macAddress
     private var machine: Machine<*>? = null
 
-    private val _equipmentType = MutableStateFlow<EquipmentType>(EquipmentType.TREADMILL)
-    val equipmentType = _equipmentType.asStateFlow()
-
-    private val _notificationStatus = MutableStateFlow<NotificationChanged>(NotificationChanged.NotificationLoading)
-    val notificationStatus = _notificationStatus.asStateFlow()
-
-    private val _connectionState = MutableStateFlow<ConnectionStatus>(ConnectionStatus.ConnectionLoading)
-    val connectionState = _connectionState.asStateFlow()
-
-    private val _machineState = MutableStateFlow<MachineState>(MachineState.DetectingMachine)
-    val machineState = _machineState.asStateFlow()
+    private val _workoutUiState = MutableStateFlow<WorkoutUiState>(WorkoutUiState())
+    val workoutUiState: StateFlow<WorkoutUiState> = _workoutUiState.asStateFlow()
 
     init {
         connectToDevice()
@@ -48,9 +48,13 @@ class WorkoutScreenViewModel @Inject constructor(
     private fun connectToDevice() {
         bleRepository.connectToDevice(
             deviceAddress = deviceAddress,
-            connectionStatusChanged = {
-                _connectionState.value = it
-                if (it is ConnectionStatus.Connected) {
+            connectionStatusChanged = { connectionStatus ->
+                _workoutUiState.update {
+                    it.copy(
+                        connectionState = connectionStatus
+                    )
+                }
+                if (connectionStatus is ConnectionStatus.Connected) {
                     discoverCharacteristics()
                     bleRepository.writeToControlPoint()
                 }
@@ -62,15 +66,19 @@ class WorkoutScreenViewModel @Inject constructor(
         bleRepository.discoverCharacteristic(
             deviceAddress = deviceAddress,
             onEquipmentCharacteristicFound = { equipmentType ->
-                _equipmentType.value = equipmentType
+                _workoutUiState.update {
+                    it.copy(
+                        equipmentType = equipmentType
+                    )
+                }
             },
             onFinished = {
-                val characteristic = when(_equipmentType.value) {
+                val characteristic = when(_workoutUiState.value.equipmentType) {
                     EquipmentType.TREADMILL -> UUID.fromString(FTMSConstants.TREADMILL_CHARACTERISTIC)
                     EquipmentType.BIKE -> TODO()
                     EquipmentType.STAIR_MASTER -> TODO()
                 }
-                machine = createMachine(_equipmentType.value)
+                machine = createMachine(_workoutUiState.value.equipmentType)
                 subscribeToCharacteristic(deviceAddress, characteristic)
             }
         )
@@ -89,7 +97,11 @@ class WorkoutScreenViewModel @Inject constructor(
                 updateMachineState(bytes)
             },
             onNotificationChanged = { notification ->
-                _notificationStatus.value = notification
+                _workoutUiState.update {
+                    it.copy(
+                        notificationStatus = notification
+                    )
+                }
             }
         )
     }
@@ -98,15 +110,19 @@ class WorkoutScreenViewModel @Inject constructor(
         val currentMachine = machine ?: return
         currentMachine.parseDataForMachine(bytes)
 
-        _machineState.value = when(currentMachine) {
-            is Treadmill -> {
-                TreadmillMachine(
-                    instantaneousSpeed = currentMachine.machineData?.instantaneousSpeed,
-                    heartRate = currentMachine.machineData?.heartRate,
-                    inclination = currentMachine.machineData?.inclination
-                )
-            }
-            else -> return
+        _workoutUiState.update {
+            it.copy(
+                machineUiState = when(currentMachine) {
+                    is Treadmill -> {
+                        TreadmillMachine(
+                            instantaneousSpeed = currentMachine.machineData?.instantaneousSpeed,
+                            heartRate = currentMachine.machineData?.heartRate,
+                            inclination = currentMachine.machineData?.inclination
+                        )
+                    }
+                    else -> return
+                }
+            )
         }
     }
 }

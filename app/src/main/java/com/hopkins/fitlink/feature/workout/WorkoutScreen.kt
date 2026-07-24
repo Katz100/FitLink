@@ -19,10 +19,7 @@ import com.hopkins.fitlink.core.ui.WorkoutView
 fun WorkoutScreen(
     viewModel: WorkoutScreenViewModel = hiltViewModel()
 ) {
-    val equipmentType = viewModel.equipmentType.collectAsStateWithLifecycle().value
-    val notificationStatus = viewModel.notificationStatus.collectAsStateWithLifecycle().value
-    val connectionState = viewModel.connectionState.collectAsStateWithLifecycle().value
-    val machineState = viewModel.machineState.collectAsStateWithLifecycle().value
+    val uiState = viewModel.workoutUiState.collectAsStateWithLifecycle().value
 
     Scaffold(
         modifier = Modifier.fillMaxSize()
@@ -33,10 +30,7 @@ fun WorkoutScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(notificationStatus.toString())
-            Text(equipmentType.toString())
-            Text(connectionState.toString())
-            WorkoutView(machineState)
+            WorkoutView(uiState.machineUiState)
             Button(
                 onClick = { viewModel.updateSpeed() }
             ) {
