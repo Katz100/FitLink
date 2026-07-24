@@ -17,6 +17,12 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import java.util.UUID
 import kotlin.test.assertTrue
+import org.mockito.Mockito
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.spy
+import org.mockito.kotlin.whenever
+import kotlin.test.assertFalse
 
 private const val deviceName = "TestDevice"
 private const val macAddress = "AA:BB:CC:DD:EE:FF"
@@ -29,6 +35,7 @@ private val treadmillData = byteArrayOf(
     0xF4.toByte(),
     0x01
 )
+val nonFTMSUuid = UUID.fromString("0000aaaa-0000-1000-8000-00805f9b34fb")
 
 @RunWith(RobolectricTestRunner::class)
 class HomeScreenTest {
@@ -64,10 +71,25 @@ class HomeScreenTest {
             .connection(connection)
             .build()
 
-        mockClient = RxBleClientMock.Builder()
-            .addDevice(device)
+        val nonFtmsSupportedDevice = RxBleDeviceMock.Builder()
+            .deviceMacAddress(macAddress)
+            .deviceName("Toaster")
+            .scanRecord(
+                RxBleScanRecordMock.Builder()
+                    .setAdvertiseFlags(1)
+                    .addServiceUuid(ParcelUuid(nonFTMSUuid))
+                    .setDeviceName("Toaster")
+                    .build()
+            )
+            .connection(connection)
             .build()
 
+        val rxMockClient = RxBleClientMock.Builder()
+            .addDevice(device)
+            .addDevice(nonFtmsSupportedDevice)
+            .build()
+
+        mockClient = spy(rxMockClient)
         bleRepository = BleRepositoryImpl(
             rxBleClient = mockClient
         )
@@ -86,5 +108,40 @@ class HomeScreenTest {
         assertTrue(viewModel.scanning.value == true)
         assertTrue(!viewModel.devices.value.isEmpty())
         assertEquals(deviceName, viewModel.devices.value[0].name)
+    }
+
+    @Test
+    fun `isBleEnabled returns false if bluetooth is not available`() {
+        doReturn(RxBleClient.State.BLUETOOTH_NOT_ENABLED).whenever(mockClient).state
+        assertFalse(viewModel.isBleEnabled())
+    }
+
+    @Test
+    fun `isBleEnabled returns true if bluetooth is available`() {
+        doReturn(RxBleClient.State.READY).whenever(mockClient).state
+        assertTrue(viewModel.isBleEnabled())
+    }
+
+    @Test
+    fun `Clearing devices clears scanned devices`() {
+        viewModel.scanForDevices()
+
+        assertTrue(!viewModel.devices.value.isEmpty())
+
+        viewModel.clearDevices()
+        assertTrue(viewModel.devices.value.isEmpty())
+    }
+
+    @Test
+    fun `Device with non-FTMS uuid is not added to scanned devices`() {
+        viewModel.scanForDevices()
+
+        assertTrue(viewModel.devices.value.size == 1)
+        assertTrue(!viewModel.devices.value.any {
+            it.name == "Toaster"
+        })
+        assertTrue(viewModel.devices.value.any{
+            it.name == deviceName
+        })
     }
 }

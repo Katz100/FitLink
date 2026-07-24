@@ -94,6 +94,7 @@ dependencies {
 
     // testing
     testImplementation("com.polidea.rxandroidble3:mockclient:1.19.1")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
     testImplementation (libs.junit.v412)
     testImplementation (libs.androidx.core)
     testImplementation (libs.robolectric)
