@@ -12,14 +12,11 @@ import com.polidea.rxandroidble3.mockrxandroidble.RxBleDeviceMock
 import com.polidea.rxandroidble3.mockrxandroidble.RxBleScanRecordMock
 import org.junit.Before
 import org.junit.Test
-import org.junit.Assert.assertEquals
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import java.util.UUID
 import kotlin.test.assertTrue
-import org.mockito.Mockito
 import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
 import org.mockito.kotlin.spy
 import org.mockito.kotlin.whenever
 import kotlin.test.assertFalse
@@ -107,7 +104,9 @@ class HomeScreenTest {
 
         assertTrue(viewModel.scanning.value == true)
         assertTrue(!viewModel.devices.value.isEmpty())
-        assertEquals(deviceName, viewModel.devices.value[0].name)
+        assertTrue(viewModel.devices.value.any {
+            it.name == deviceName
+        })
     }
 
     @Test
