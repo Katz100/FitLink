@@ -10,10 +10,14 @@ import com.hopkins.fitlink.core.ftms.EquipmentType
 import com.hopkins.fitlink.core.ftms.FTMSConstants
 import com.polidea.rxandroidble3.RxBleClient
 import com.polidea.rxandroidble3.RxBleConnection
+import com.polidea.rxandroidble3.helpers.ValueInterpreter
 import com.polidea.rxandroidble3.scan.ScanFilter
 import com.polidea.rxandroidble3.scan.ScanSettings
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.functions.BiFunction
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.onCompletion
@@ -207,26 +211,83 @@ class BleRepositoryImpl @Inject constructor(
             return
         }
 
+        val controlPointUuid =
+            UUID.fromString(FTMSConstants.FITNESS_MACHINE_CONTROL_POINT_UUID)
+
+        val requestControlCommand = byteArrayOf(
+            FTMSConstants.REQUEST_CONTROL_POINT.toByte()
+        )
+
         val disposable = connection
-            .setupIndication(UUID.fromString(FTMSConstants.FITNESS_MACHINE_CONTROL_POINT_UUID))
+            .setupIndication(controlPointUuid)
             .doOnNext {
                 Timber.tag(TAG).i("Indication set up for control point")
             }
-            .flatMap { it }
-            .subscribe(
-                { bytes ->
-                    val hex = bytes.joinToString(separator = " ") { byte ->
-                        "%02X".format(byte.toInt() and 0xFF)
-                    }
-                    Timber.tag(TAG).i("Successful response from control point: $hex")
-                },
-                {
-                    Timber.tag(TAG).e("Error writing to control point: $it")
-                }
+            .flatMapSingle { indications ->
 
+                val responseSingle = indications
+                    .filter { value ->
+                        value.size >= 3 &&
+                                value.uint8(0) == FTMSConstants.OP_RESPONSE_CODE &&
+                                value.uint8(1) == FTMSConstants.REQUEST_CONTROL_POINT
+                    }
+                    .firstOrError()
+
+                /*
+                 * responseSingle is supplied first so the indication stream is
+                 * subscribed before the write is initiated.
+                 */
+                Single.zip(
+                    responseSingle,
+                    connection.writeCharacteristic(
+                        controlPointUuid,
+                        requestControlCommand
+                    ),
+                    BiFunction<ByteArray, ByteArray, ByteArray> {
+                            response, _ ->
+                        response
+                    }
+                )
+            }
+            .firstOrError()
+            .timeout(10, TimeUnit.SECONDS)
+            .flatMapCompletable { response ->
+                val resultCode = response.uint8(2)
+
+                if (resultCode == FTMSConstants.RESULT_SUCCESS) {
+                    Timber.tag(TAG).i("Control point granted")
+                    Completable.complete()
+                } else {
+                    Completable.error(
+                        RuntimeException("Control point failed ${resultCode}")
+                    )
+                }
+            }
+            .subscribe(
+                {
+                    Timber.tag(TAG).i("Request Control procedure completed")
+                },
+                { error ->
+                    Timber.tag(TAG).e(
+                        error,
+                        "Request Control procedure failed"
+                    )
+                }
             )
+
         operationDisposables.add(disposable)
     }
+
+    fun ByteArray.uint8(offset: Int): Int =
+        requireNotNull(
+            ValueInterpreter.getIntValue(
+                this,
+                ValueInterpreter.FORMAT_UINT8,
+                offset
+            )
+        ) {
+            "Unable to read UINT8 at offset $offset from $size-byte value"
+        }
 
     override fun setSpeed(speedInKph: Double, deviceAddress: String) {
         val bytesToWrite = byteArrayOf(

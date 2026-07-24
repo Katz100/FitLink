@@ -26,5 +26,6 @@ fun TreadmillView(
             value = machineState.instantaneousSpeed.toString()
         )
         Text(machineState.heartRate.toString())
+        Text(machineState.inclination.toString())
     }
 }

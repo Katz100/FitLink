@@ -57,7 +57,7 @@ class Treadmill: Machine<TreadmillData>(
         var totalEnergyKcal: Double? = null
         var energyPerHourKcal: Double? = null
         var energyPerMinuteKcal: Double? = null
-        var heartRateBpm: Double? = null
+        var heartRateBpm: Int? = null
         var metabolicEquivalent: Double? = null
         var elapsedTimeSeconds: Double? = null
         var remainingTimeSeconds: Double? = null
@@ -192,7 +192,7 @@ class Treadmill: Machine<TreadmillData>(
                 bytes,
                 ValueInterpreter.FORMAT_UINT8,
                 offset
-            )?.toDouble() ?: return
+            ) ?: return
             offset += 1
         }
 
@@ -257,33 +257,9 @@ class Treadmill: Machine<TreadmillData>(
             offset += 2
         }
 
-        Timber.tag("Machine").i(
-            """
-        Parsed machine data:
-        flags=$flags
-        instantaneousSpeedMph=$speedMph
-        averageSpeedMph=$averageSpeed
-        totalDistance=$totalDistance
-        inclinationPercent=$inclinationPercent
-        inclinationAngle=$inclinationAngle
-        positiveElevationGain=$positiveGain
-        negativeElevationGain=$negativeGain
-        instantaneousPace=$instantPace
-        averagePace=$averagePace
-        totalEnergyKcal=$totalEnergyKcal
-        energyPerHourKcal=$energyPerHourKcal
-        energyPerMinuteKcal=$energyPerMinuteKcal
-        heartRateBpm=$heartRateBpm
-        metabolicEquivalent=$metabolicEquivalent
-        elapsedTimeSeconds=$elapsedTimeSeconds
-        remainingTimeSeconds=$remainingTimeSeconds
-        forceOnBeltNewtons=$forceOnBeltNewtons
-        powerOutputWatts=$powerOutputWatts
-        """.trimIndent()
-        )
-
         machineData = machineData?.let { current ->
             current.copy(
+                heartRate = heartRateBpm ?: current.heartRate,
                 instantaneousSpeed =
                     speedMph ?: current.instantaneousSpeed,
                 averageSpeed =

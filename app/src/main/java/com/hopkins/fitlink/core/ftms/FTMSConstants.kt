@@ -8,4 +8,6 @@ object FTMSConstants {
 
     const val MPH_CONSTANT = 0.621371
     const val REQUEST_CONTROL_POINT = 0x00
+    const val OP_RESPONSE_CODE = 0x80
+    const val RESULT_SUCCESS = 0x01
 }
