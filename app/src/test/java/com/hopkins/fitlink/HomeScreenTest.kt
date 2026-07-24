@@ -143,4 +143,4 @@ class HomeScreenTest {
             it.name == deviceName
         })
     }
-}//
+}
