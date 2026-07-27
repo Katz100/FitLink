@@ -34,7 +34,6 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.hopkins.fitlink.core.ble.Connectivity
 import com.hopkins.fitlink.core.ble.FitBLE
 import com.hopkins.fitlink.core.ui.DeviceItem
 

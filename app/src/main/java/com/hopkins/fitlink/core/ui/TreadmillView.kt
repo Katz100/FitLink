@@ -2,7 +2,6 @@ package com.hopkins.fitlink.core.ui
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
@@ -13,13 +12,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.hopkins.fitlink.core.data.ConnectionStatus
-import com.hopkins.fitlink.core.ftms.MachineState
+import com.hopkins.fitlink.core.ftms.domain.model.MachineUiState
 import java.util.Locale
 
 @Composable
 fun TreadmillView(
     modifier: Modifier = Modifier,
-    machineState: MachineState.TreadmillMachine,
+    machineState: MachineUiState.TreadmillMachine,
     connectionStatus: ConnectionStatus,
 ) {
     Box(
@@ -69,7 +68,7 @@ fun TreadMillViewPreview() {
             width = 500.dp,
             height = 200.dp
         ),
-        machineState = MachineState.TreadmillMachine(
+        machineState = MachineUiState.TreadmillMachine(
             instantaneousSpeed = 500.0,
             heartRate = 100,
             inclination = 12.0

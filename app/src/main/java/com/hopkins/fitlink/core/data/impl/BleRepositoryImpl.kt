@@ -6,8 +6,8 @@ import com.hopkins.fitlink.core.data.BleRepository
 import com.hopkins.fitlink.core.data.ConnectionStatus
 import com.hopkins.fitlink.core.data.NotificationChanged
 import com.hopkins.fitlink.core.data.toBleDevice
-import com.hopkins.fitlink.core.ftms.EquipmentType
 import com.hopkins.fitlink.core.ftms.FTMSConstants
+import com.hopkins.fitlink.core.ftms.domain.model.EquipmentType
 import com.polidea.rxandroidble3.RxBleClient
 import com.polidea.rxandroidble3.RxBleConnection
 import com.polidea.rxandroidble3.helpers.ValueInterpreter

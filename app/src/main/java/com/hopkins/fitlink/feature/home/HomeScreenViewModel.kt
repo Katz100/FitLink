@@ -3,7 +3,6 @@ package com.hopkins.fitlink.feature.home
 import androidx.lifecycle.ViewModel
 import com.hopkins.fitlink.core.data.BleDevice
 import com.hopkins.fitlink.core.data.BleRepository
-import com.polidea.rxandroidble3.RxBleDevice
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

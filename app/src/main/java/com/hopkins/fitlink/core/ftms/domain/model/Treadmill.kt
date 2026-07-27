@@ -1,14 +1,9 @@
-package com.hopkins.fitlink.core.ftms
+package com.hopkins.fitlink.core.ftms.domain.model
 
+import com.hopkins.fitlink.core.ftms.FTMSConstants
+import com.hopkins.fitlink.core.ftms.util.getUInt24
+import com.hopkins.fitlink.core.ftms.util.hasFlag
 import com.polidea.rxandroidble3.helpers.ValueInterpreter
-import timber.log.Timber
-
-abstract class Machine<Data>(
-) {
-    abstract var machineData: Data?
-
-    abstract fun parseDataForMachine(bytes: ByteArray)
-}
 
 class Treadmill: Machine<TreadmillData>(
 ) {
@@ -280,67 +275,5 @@ class Treadmill: Machine<TreadmillData>(
                     totalEnergyKcal ?: current.totalEnergy
             )
         }
-    }
-}
-
-private fun getUInt24(
-    bytes: ByteArray,
-    offset: Int
-): Int? {
-    if (offset + 3 > bytes.size) return null
-
-    return (bytes[offset].toInt() and 0xFF) or
-            ((bytes[offset + 1].toInt() and 0xFF) shl 8) or
-            ((bytes[offset + 2].toInt() and 0xFF) shl 16)
-}
-
-fun hasFlag(bit: Int, flags: Int): Boolean {
-    return flags and (1 shl bit) != 0
-}
-enum class EquipmentType {
-    TREADMILL,
-    BIKE,
-    STAIR_MASTER,
-}
-
-sealed interface MachineState {
-    data object DetectingMachine: MachineState
-
-    data class TreadmillMachine(
-        val instantaneousSpeed: Double?,
-        val heartRate: Int?,
-        val distance: Double = 0.0,
-        val totalDistance: Int? = 0,
-        val inclination: Double? = 0.0
-    ): MachineState
-}
-
-data class TreadmillData(
-    val moreData: Boolean,
-    val instantaneousSpeed: Double?,
-    val averageSpeed: Double?,
-    val totalDistance: Int?,
-    val inclination: Double?,
-    val rampAngleSetting: Double?,
-    val positiveElevationGain: Int?,
-    val negativeElevationGain: Int?,
-    val instantaneousPace: Double?,
-    val averagePace: Double?,
-    val totalEnergy: Double?,
-    val energyPerHour: Int?,
-    val energyPerMinute: Int?,
-    val heartRate: Int?,
-    val metabolicEquivalent: Double?,
-    val elapsedTime: Int?,
-    val remainingTime: Int?,
-    val forceOnBelt: Int?,
-    val powerOutput: Int?
-)
-
-fun createMachine(equipmentType: EquipmentType): Machine<*> {
-    return when (equipmentType) {
-        EquipmentType.TREADMILL -> Treadmill()
-        EquipmentType.BIKE -> TODO()
-        EquipmentType.STAIR_MASTER -> TODO()
     }
 }
