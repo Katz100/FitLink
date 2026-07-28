@@ -3,8 +3,8 @@ package com.hopkins.fitlink.core.ui
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -59,7 +59,7 @@ fun TreadmillView(
     }
 }
 
-@Preview(showBackground = true, device = "spec:width=1280dp,height=800dp,dpi=240")
+@TabletPreview
 @Composable
 fun TreadMillViewTabletPreview() {
     FitLinkTheme {
@@ -74,22 +74,25 @@ fun TreadMillViewTabletPreview() {
     }
 }
 
-@Preview(showBackground = true, device = "spec:width=411dp,height=891dp,dpi=420,isRound=false,chinSize=0dp,orientation=landscape,cutout=none,navigation=gesture")
+@LandscapePhoneDarkPreview
 @Composable
-fun TreadMillViewPhoneLandscapePreview() {
-    FitLinkTheme {
-        TreadmillView(
-            machineState = MachineUiState.TreadmillMachine(
-                instantaneousSpeed = 500.0,
-                heartRate = 100,
-                inclination = 12.0
-            ),
-            connectionStatus = ConnectionStatus.Connected
-        )
+fun TreadMillViewPhoneLandscapeDarkPreview() {
+    FitLinkTheme(darkTheme = true) {
+        Scaffold { innerPadding ->
+            TreadmillView(
+                modifier = Modifier.padding(innerPadding),
+                machineState = MachineUiState.TreadmillMachine(
+                    instantaneousSpeed = 500.0,
+                    heartRate = 100,
+                    inclination = 12.0
+                ),
+                connectionStatus = ConnectionStatus.Connected
+            )
+        }
     }
 }
 
-@Preview(showBackground = true, device = "spec:width=411dp,height=891dp,dpi=420,isRound=false,chinSize=0dp,orientation=portrait,cutout=none,navigation=gesture")
+@PortraitPhonePreview
 @Composable
 fun TreadMillViewPhonePortraitPreview() {
     FitLinkTheme {
