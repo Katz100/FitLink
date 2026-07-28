@@ -25,6 +25,7 @@ import timber.log.Timber
 import java.util.UUID
 import javax.inject.Inject
 
+@Deprecated("Use BleRepository instead")
 @SuppressLint("MissingPermission")
 class FitBLE @Inject constructor(
     private val fitBluetoothLeScanner: FitBluetoothLeScanner,
