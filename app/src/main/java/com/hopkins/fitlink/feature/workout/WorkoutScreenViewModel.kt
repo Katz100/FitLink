@@ -108,7 +108,9 @@ class WorkoutScreenViewModel @Inject constructor(
                         TreadmillMachine(
                             instantaneousSpeed = currentMachine.machineData?.instantaneousSpeed,
                             heartRate = currentMachine.machineData?.heartRate,
-                            inclination = currentMachine.machineData?.inclination
+                            inclination = currentMachine.machineData?.inclination,
+                            elapsedTime = currentMachine.machineData?.elapsedTime,
+                            timeRemaining = currentMachine.machineData?.remainingTime,
                         )
                     }
                     else -> return
