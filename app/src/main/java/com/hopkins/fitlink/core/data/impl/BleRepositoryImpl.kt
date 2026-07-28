@@ -18,10 +18,6 @@ import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.functions.BiFunction
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.UUID
 import java.util.concurrent.TimeUnit
@@ -306,68 +302,4 @@ class BleRepositoryImpl @Inject constructor(
         scanDisposable?.dispose()
         scanDisposable = null
     }
-}
-
-class BleRepositoryFake(
-    private val scope: CoroutineScope
-) : BleRepository {
-
-    var isBleOn: Boolean = true
-    private val deviceName = "TestDevice"
-    private val macAddress = "AA:BB:CC:DD:EE:FF"
-
-
-    override fun scanDevices(
-        onDeviceScanned: (BleDevice) -> Unit,
-        onScanningFinished: () -> Unit
-    ) {
-        val devices = flowOf(BleDevice(deviceName, macAddress))
-
-        scope.launch {
-            devices
-                .onCompletion {
-                    onScanningFinished()
-                }
-                .collect { device ->
-                    onDeviceScanned(device)
-                }
-        }
-    }
-
-    override fun connectAndSubscribeToCharacteristic(
-        characteristic: UUID,
-        deviceAddress: String,
-        onBytesReceived: (ByteArray) -> Unit,
-        onNotificationChanged: (NotificationChanged) -> Unit
-    ) {
-        TODO("")
-    }
-
-    override fun connectToDevice(
-        deviceAddress: String,
-        on: (ConnectionStatus) -> Unit
-    ) {
-        TODO("Not yet implemented")
-    }
-
-    override fun discoverCharacteristic(
-        deviceAddress: String,
-        onEquipmentCharacteristicFound: (EquipmentType) -> Unit,
-        onFinished: () -> Unit
-    ) {
-        TODO("Not yet implemented")
-    }
-
-    override fun writeToControlPoint() {
-        TODO("Not yet implemented")
-    }
-
-    override fun setSpeed(speedInKph: Double, deviceAddress: String) {
-        TODO("Not yet implemented")
-    }
-
-    override fun isBleEnabled(): Boolean {
-        return isBleOn
-    }
-
 }
