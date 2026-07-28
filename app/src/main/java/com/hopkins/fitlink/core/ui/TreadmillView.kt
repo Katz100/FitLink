@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.hopkins.fitlink.core.data.ConnectionStatus
 import com.hopkins.fitlink.core.ftms.domain.model.MachineUiState
+import com.hopkins.fitlink.core.ftms.util.formatSeconds
 import com.hopkins.fitlink.ui.theme.FitLinkTheme
 import java.util.Locale
 
@@ -63,14 +64,14 @@ fun TreadmillView(
                     modifier = Modifier.size(175.dp),
                     title = "Elapsed Time",
                     metric = "Minutes",
-                    data = machineState.elapsedTime.toString()
+                    data = formatSeconds(machineState.elapsedTime)
                 )
                 Spacer(modifier = modifier.width(12.dp))
                 MachineDataCard(
                     modifier = Modifier.size(175.dp),
                     title = "Remaining Time",
                     metric = "Minutes",
-                    data = machineState.timeRemaining.toString()
+                    data = formatSeconds(machineState.timeRemaining)
                 )
             }
 

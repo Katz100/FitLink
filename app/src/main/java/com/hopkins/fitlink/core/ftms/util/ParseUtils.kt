@@ -14,3 +14,12 @@ fun getUInt24(
 fun hasFlag(bit: Int, flags: Int): Boolean {
     return flags and (1 shl bit) != 0
 }
+
+fun formatSeconds(seconds: Int?): String {
+    if (seconds == null || seconds < 0) return "--:--"
+
+    val minutes = seconds / 60
+    val remainingSeconds = seconds % 60
+
+    return "%02d:%02d".format(minutes, remainingSeconds)
+}
