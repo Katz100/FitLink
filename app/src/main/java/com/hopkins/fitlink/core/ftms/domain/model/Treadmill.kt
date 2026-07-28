@@ -255,6 +255,8 @@ class Treadmill: Machine<TreadmillData>(
         machineData = machineData?.let { current ->
             current.copy(
                 heartRate = heartRateBpm ?: current.heartRate,
+                elapsedTime = elapsedTimeSeconds?.toInt() ?: current.elapsedTime,
+                remainingTime = remainingTimeSeconds?.toInt() ?: current.remainingTime,
                 instantaneousSpeed =
                     speedMph ?: current.instantaneousSpeed,
                 averageSpeed =
@@ -272,7 +274,7 @@ class Treadmill: Machine<TreadmillData>(
                 averagePace =
                     averagePace ?: current.averagePace,
                 totalEnergy =
-                    totalEnergyKcal ?: current.totalEnergy
+                    totalEnergyKcal ?: current.totalEnergy,
             )
         }
     }
