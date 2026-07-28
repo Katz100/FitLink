@@ -2,13 +2,13 @@ package com.hopkins.fitlink.core.data
 
 import com.polidea.rxandroidble3.RxBleDevice
 
-data class BleDevice(
+data class BleDeviceModel(
     val name: String,
     val macAddress: String,
 )
 
-fun RxBleDevice.toBleDevice(): BleDevice {
-    return BleDevice(
+fun RxBleDevice.toBleDevice(): BleDeviceModel {
+    return BleDeviceModel(
         name = this.name ?: "N/A",
         macAddress = this.macAddress
     )

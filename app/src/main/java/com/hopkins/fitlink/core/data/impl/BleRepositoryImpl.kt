@@ -1,7 +1,7 @@
 package com.hopkins.fitlink.core.data.impl
 
 import android.os.ParcelUuid
-import com.hopkins.fitlink.core.data.BleDevice
+import com.hopkins.fitlink.core.data.BleDeviceModel
 import com.hopkins.fitlink.core.data.BleRepository
 import com.hopkins.fitlink.core.data.ConnectionStatus
 import com.hopkins.fitlink.core.data.NotificationChanged
@@ -37,7 +37,7 @@ class BleRepositoryImpl @Inject constructor(
     private val operationDisposables = CompositeDisposable()
 
     override fun scanDevices(
-        onDeviceScanned: (BleDevice) -> Unit,
+        onDeviceScanned: (BleDeviceModel) -> Unit,
         onScanningFinished: () -> Unit,
     ) {
         scanDisposable?.dispose()

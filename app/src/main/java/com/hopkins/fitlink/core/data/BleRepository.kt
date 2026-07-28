@@ -16,7 +16,7 @@ interface BleRepository {
      * @param onScanningFinished the lambda that is called when scanning is finished
      */
     fun scanDevices(
-        onDeviceScanned: (BleDevice) -> Unit,
+        onDeviceScanned: (BleDeviceModel) -> Unit,
         onScanningFinished: () -> Unit,
     )
 
