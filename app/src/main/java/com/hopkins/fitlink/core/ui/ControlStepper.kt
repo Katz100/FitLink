@@ -3,7 +3,9 @@ package com.hopkins.fitlink.core.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -37,6 +39,7 @@ fun ControlStepper(
     value: String,
     unit: String,
     buttonsEnabled: Boolean = true,
+    buttonHeight: Dp = 90.dp,
     onIncrementPressed: () -> Unit = {},
     onDecrementPressed: () -> Unit = {},
 ) {
@@ -47,7 +50,7 @@ fun ControlStepper(
                 shape = MaterialTheme.shapes.medium
             )
             .padding(4.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         MetricSummaryCard(
             cardColor = CardDefaults.cardColors(
@@ -61,6 +64,7 @@ fun ControlStepper(
 
         StepperButton(
             modifier = Modifier.fillMaxWidth()
+                .height(buttonHeight)
                 .shadow(
                     elevation = 6.dp,
                     shape = MaterialTheme.shapes.medium,
@@ -71,9 +75,9 @@ fun ControlStepper(
             imageVector = Icons.Default.KeyboardArrowUp,
             onPressed = onIncrementPressed
         )
-
         StepperButton(
             modifier = Modifier.fillMaxWidth()
+                .height(buttonHeight)
                 .shadow(
                     elevation = 6.dp,
                     shape = MaterialTheme.shapes.medium,
@@ -95,22 +99,31 @@ private fun MetricSummaryCard(
     value: String,
     unit: String,
     valueTextStyle: TextStyle,
+    headingTextStyle: TextStyle = MaterialTheme.typography.headlineMedium,
+    unitTextStyle: TextStyle = MaterialTheme.typography.labelMedium,
 ) {
     Card(
         modifier = modifier,
         colors = cardColor
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth()
+                .padding(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            Text(heading)
+            Text(
+                text = heading,
+                style = headingTextStyle
+            )
             Text(
                 text = value,
                 style = valueTextStyle
             )
-            Text(unit)
+            Text(
+                text = unit,
+                style = unitTextStyle
+            )
         }
     }
 }
@@ -142,7 +155,7 @@ private fun StepperButton(
     }
 }
 
-@Preview(showBackground = true,)
+@Preview(showBackground = true)
 @Composable
 fun ControlStepperPreview() {
     ControlStepper(

@@ -13,6 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.hopkins.fitlink.core.data.ConnectionStatus
 import com.hopkins.fitlink.core.ftms.domain.model.MachineUiState
+import com.hopkins.fitlink.ui.theme.FitLinkTheme
 import java.util.Locale
 
 @Composable
@@ -27,7 +28,7 @@ fun TreadmillView(
         ControlStepper(
             modifier = Modifier
                 .align(Alignment.CenterStart)
-                .width(150.dp),
+                .width(180.dp),
             heading = "Inclination",
             unit = "%",
             value = if (machineState.inclination == null) {
@@ -60,19 +61,17 @@ fun TreadmillView(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, device = "spec:width=1280dp,height=800dp,dpi=240")
 @Composable
 fun TreadMillViewPreview() {
-    TreadmillView(
-        modifier = Modifier.size(
-            width = 500.dp,
-            height = 200.dp
-        ),
-        machineState = MachineUiState.TreadmillMachine(
-            instantaneousSpeed = 500.0,
-            heartRate = 100,
-            inclination = 12.0
-        ),
-        connectionStatus = ConnectionStatus.Connected
-    )
+    FitLinkTheme {
+        TreadmillView(
+            machineState = MachineUiState.TreadmillMachine(
+                instantaneousSpeed = 500.0,
+                heartRate = 100,
+                inclination = 12.0
+            ),
+            connectionStatus = ConnectionStatus.Connected
+        )
+    }
 }
