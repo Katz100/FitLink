@@ -73,6 +73,13 @@ fun TreadmillView(
                     metric = "Minutes",
                     data = formatSeconds(machineState.timeRemaining)
                 )
+                Spacer(modifier = modifier.width(12.dp))
+                MachineDataCard(
+                    modifier = Modifier.size(175.dp),
+                    title = "Heart Rate",
+                    metric = "BPM",
+                    data = machineState.heartRate.toString()
+                )
             }
 
 
