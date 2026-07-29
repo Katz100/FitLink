@@ -6,10 +6,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.hopkins.fitlink.core.data.ConnectionStatus
 import com.hopkins.fitlink.core.ftms.domain.model.MachineUiState
 import com.hopkins.fitlink.core.ui.TreadmillView
 
@@ -18,6 +20,12 @@ fun WorkoutScreen(
     viewModel: WorkoutScreenViewModel = hiltViewModel()
 ) {
     val uiState = viewModel.workoutUiState.collectAsStateWithLifecycle().value
+
+    LaunchedEffect(uiState.connectionState) {
+        if (uiState.connectionState == ConnectionStatus.Disconnected) {
+            // show dialog
+        }
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize()

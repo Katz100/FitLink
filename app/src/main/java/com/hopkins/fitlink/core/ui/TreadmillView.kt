@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -49,33 +50,37 @@ fun TreadmillView(
                 .align(Alignment.Center)
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.Bottom
         ) {
             ControlStepper(
-                modifier = Modifier.width(180.dp),
+                modifier = Modifier.weight(1f),
                 heading = "Inclination",
                 unit = "%",
                 value = machineState.inclination?.toString() ?: "--"
             )
 
-            Row {
+            Row(
+                modifier = Modifier.weight(3f),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ){
                 MachineDataCard(
-                    modifier = Modifier.size(175.dp),
+                    modifier = Modifier.weight(1f)
+                        .aspectRatio(1f),
                     title = "Elapsed Time",
                     metric = "Minutes",
                     data = formatSeconds(machineState.elapsedTime)
                 )
-                Spacer(modifier = modifier.width(12.dp))
                 MachineDataCard(
-                    modifier = Modifier.size(175.dp),
+                    modifier = Modifier.weight(1f)
+                        .aspectRatio(1f),
                     title = "Remaining Time",
                     metric = "Minutes",
                     data = formatSeconds(machineState.timeRemaining)
                 )
-                Spacer(modifier = modifier.width(12.dp))
                 MachineDataCard(
-                    modifier = Modifier.size(175.dp),
+                    modifier = Modifier.weight(1f)
+                        .aspectRatio(1f),
                     title = "Heart Rate",
                     metric = "BPM",
                     data = machineState.heartRate.toString()
@@ -84,7 +89,7 @@ fun TreadmillView(
 
 
             ControlStepper(
-                modifier = Modifier.width(180.dp),
+                modifier = Modifier.weight(1f),
                 heading = "Speed",
                 unit = "MPH",
                 value = String.format(
