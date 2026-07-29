@@ -112,7 +112,7 @@ fun TreadMillViewTabletPreview() {
     }
 }
 
-@LandscapePhoneDarkPreview
+@LandscapePhonePreview
 @Composable
 fun TreadMillViewPhoneLandscapeDarkPreview() {
     FitLinkTheme(darkTheme = true) {

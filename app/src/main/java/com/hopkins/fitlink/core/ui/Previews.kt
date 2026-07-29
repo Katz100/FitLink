@@ -14,7 +14,7 @@ annotation class TabletPreview
     showBackground = true,
     device = "spec:width=411dp,height=891dp,dpi=420,isRound=false,chinSize=0dp,orientation=landscape,cutout=none,navigation=gesture"
 )
-annotation class LandscapePhoneDarkPreview
+annotation class LandscapePhonePreview
 
 @Preview(
     name = "PhonePortrait",
