@@ -7,12 +7,17 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,6 +34,8 @@ fun TreadmillView(
     connectionStatus: ConnectionStatus,
     modifier: Modifier = Modifier
 ) {
+    var showAdditionalDetailsForTime by remember { mutableStateOf(true) }
+
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -48,8 +55,7 @@ fun TreadmillView(
         Row(
             modifier = Modifier
                 .align(Alignment.Center)
-                .fillMaxWidth()
-                .align(Alignment.BottomCenter),
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.Bottom
         ) {
@@ -61,29 +67,35 @@ fun TreadmillView(
             )
 
             Row(
-                modifier = Modifier.weight(3f),
+                modifier = Modifier.weight(2f),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.Bottom
             ){
-                MachineDataCard(
-                    modifier = Modifier.weight(1f)
-                        .aspectRatio(1f),
-                    title = "Elapsed Time",
-                    metric = "Minutes",
-                    data = formatSeconds(machineState.elapsedTime)
+                KpiCard(
+                    statItems = listOf(
+                        StatItem(
+                            label = "Elapsed Time",
+                            value = formatSeconds(machineState.elapsedTime)
+                        ),
+                        StatItem(
+                            label = "Time Remaining",
+                            value = formatSeconds(machineState.timeRemaining)
+                        )
+                    ),
+                    modifier = Modifier.weight(1f),
+                    showAdditionalItems = showAdditionalDetailsForTime,
+                    onShowAdditionalItemsClick = { showAdditionalDetailsForTime = !showAdditionalDetailsForTime }
                 )
-                MachineDataCard(
-                    modifier = Modifier.weight(1f)
-                        .aspectRatio(1f),
-                    title = "Remaining Time",
-                    metric = "Minutes",
-                    data = formatSeconds(machineState.timeRemaining)
-                )
-                MachineDataCard(
-                    modifier = Modifier.weight(1f)
-                        .aspectRatio(1f),
-                    title = "Heart Rate",
-                    metric = "BPM",
-                    data = machineState.heartRate.toString()
+                KpiCard(
+                    modifier = Modifier.weight(1f),
+                    statItems = listOf(
+                        StatItem(
+                            label = "Heart Rate",
+                            value = if (machineState.heartRate == 0) "--" else machineState.heartRate.toString()
+                        )
+                    ),
+                    showAdditionalItems = false,
+                    onShowAdditionalItemsClick = {}
                 )
             }
 
