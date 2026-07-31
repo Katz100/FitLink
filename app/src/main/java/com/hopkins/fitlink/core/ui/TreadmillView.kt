@@ -68,7 +68,7 @@ fun TreadmillView(
             ){
                 KpiCard(
                     statItems = listOf(
-                        hashMapOf("Elasped Time" to formatSeconds(machineState.elapsedTime)),
+                        hashMapOf("Elapsed Time" to formatSeconds(machineState.elapsedTime)),
                         hashMapOf("Time Remaining" to formatSeconds(machineState.timeRemaining))
                     ),
                     modifier = Modifier.weight(1f),
