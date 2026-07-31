@@ -3,14 +3,9 @@ package com.hopkins.fitlink.core.ui
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,7 +29,7 @@ fun TreadmillView(
     connectionStatus: ConnectionStatus,
     modifier: Modifier = Modifier
 ) {
-    var showAdditionalDetailsForTime by remember { mutableStateOf(true) }
+    var showAdditionalDetailsForTime by remember { mutableStateOf(false) }
 
     Box(
         modifier = modifier
@@ -73,14 +68,8 @@ fun TreadmillView(
             ){
                 KpiCard(
                     statItems = listOf(
-                        StatItem(
-                            label = "Elapsed Time",
-                            value = formatSeconds(machineState.elapsedTime)
-                        ),
-                        StatItem(
-                            label = "Time Remaining",
-                            value = formatSeconds(machineState.timeRemaining)
-                        )
+                        hashMapOf("Elasped Time" to formatSeconds(machineState.elapsedTime)),
+                        hashMapOf("Time Remaining" to formatSeconds(machineState.timeRemaining))
                     ),
                     modifier = Modifier.weight(1f),
                     showAdditionalItems = showAdditionalDetailsForTime,
@@ -89,10 +78,7 @@ fun TreadmillView(
                 KpiCard(
                     modifier = Modifier.weight(1f),
                     statItems = listOf(
-                        StatItem(
-                            label = "Heart Rate",
-                            value = if (machineState.heartRate == 0) "--" else machineState.heartRate.toString()
-                        )
+                        hashMapOf("Heart Rate" to if (machineState.heartRate == 0) "--" else machineState.heartRate.toString())
                     ),
                     showAdditionalItems = false,
                     onShowAdditionalItemsClick = {}

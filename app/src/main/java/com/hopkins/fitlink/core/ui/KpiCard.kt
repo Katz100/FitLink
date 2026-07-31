@@ -27,15 +27,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
-data class StatItem(
-    val label: String,
-    val value: String,
-)
-
 @Composable
 fun KpiCard(
     modifier: Modifier = Modifier,
-    statItems: List<StatItem>,
+    statItems: List<HashMap<String, String>>,
     showAdditionalItems: Boolean,
     onShowAdditionalItemsClick: () -> Unit,
 ) {
@@ -50,18 +45,22 @@ fun KpiCard(
     ) {
         if (showAdditionalItems) {
             statItems.drop(1).forEach { item ->
-                MetricCard(
-                    value = item.value,
-                    label = item.label
-                )
+                item.forEach { (key, value) ->
+                    MetricCard(
+                        label = key,
+                        value = value
+                    )
+                }
             }
         }
 
         Box {
-            MetricCard(
-                value = statItems.first().value,
-                label = statItems.first().label
-            )
+            for ((key, value) in statItems.first()) {
+                MetricCard(
+                    label = key,
+                    value = value
+                )
+            }
 
             IconButton(
                 modifier = Modifier.align(Alignment.TopEnd),
@@ -129,7 +128,11 @@ fun MetricCard(
 @Preview(showBackground = true)
 @Composable
 fun KpiCardPreview() {
-    val items = listOf(StatItem("Calories", "0"), StatItem("Calories/Hour", "99"), StatItem("Watts", "23"))
+    val items = listOf(
+        hashMapOf("Calories" to "0"),
+        hashMapOf("Calories/Hour" to "99"),
+        hashMapOf("Watts" to "23")
+    )
     KpiCard(
         modifier = Modifier.width(200.dp),
         statItems = items,
