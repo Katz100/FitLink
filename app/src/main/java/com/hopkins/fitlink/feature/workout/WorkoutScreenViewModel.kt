@@ -111,6 +111,9 @@ class WorkoutScreenViewModel @Inject constructor(
                             inclination = currentMachine.machineData?.inclination,
                             elapsedTime = currentMachine.machineData?.elapsedTime,
                             timeRemaining = currentMachine.machineData?.remainingTime,
+                            calories = currentMachine.machineData?.totalEnergy?.toString() ?: "--",
+                            caloriesAnHour = currentMachine.machineData?.energyPerHour?.toString() ?: "--",
+                            watts = currentMachine.machineData?.powerOutput?.toString() ?: "--"
                         )
                     }
                     else -> return

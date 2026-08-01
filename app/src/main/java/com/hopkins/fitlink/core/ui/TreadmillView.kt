@@ -30,6 +30,7 @@ fun TreadmillView(
     modifier: Modifier = Modifier
 ) {
     var showAdditionalDetailsForTime by remember { mutableStateOf(false) }
+    var showAdditionalDetailsForCalories by remember { mutableStateOf(false) }
 
     Box(
         modifier = modifier
@@ -62,7 +63,7 @@ fun TreadmillView(
             )
 
             Row(
-                modifier = Modifier.weight(2f),
+                modifier = Modifier.weight(3f),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.Bottom
             ){
@@ -82,6 +83,16 @@ fun TreadmillView(
                     ),
                     showAdditionalItems = false,
                     onShowAdditionalItemsClick = {}
+                )
+                KpiCard(
+                    modifier = Modifier.weight(1f),
+                    statItems = listOf(
+                        hashMapOf("Calories" to machineState.calories.toString()),
+                        hashMapOf("Calories/Hour" to machineState.caloriesAnHour.toString()),
+                        hashMapOf("Watts" to machineState.watts.toString())
+                    ),
+                    showAdditionalItems = showAdditionalDetailsForCalories,
+                    onShowAdditionalItemsClick = { showAdditionalDetailsForCalories = !showAdditionalDetailsForCalories}
                 )
             }
 
@@ -108,7 +119,10 @@ fun TreadMillViewTabletPreview() {
             machineState = MachineUiState.TreadmillMachine(
                 instantaneousSpeed = 500.0,
                 heartRate = 100,
-                inclination = 12.0
+                inclination = 12.0,
+                calories = "250",
+                caloriesAnHour = "600",
+                watts = "180"
             ),
             connectionStatus = ConnectionStatus.Connected
         )
@@ -125,7 +139,10 @@ fun TreadMillViewPhoneLandscapeDarkPreview() {
                 machineState = MachineUiState.TreadmillMachine(
                     instantaneousSpeed = 500.0,
                     heartRate = 100,
-                    inclination = 12.0
+                    inclination = 12.0,
+                    calories = "250",
+                    caloriesAnHour = "600",
+                    watts = "180"
                 ),
                 connectionStatus = ConnectionStatus.Connected
             )
@@ -141,7 +158,10 @@ fun TreadMillViewPhonePortraitPreview() {
             machineState = MachineUiState.TreadmillMachine(
                 instantaneousSpeed = 500.0,
                 heartRate = 100,
-                inclination = 12.0
+                inclination = 12.0,
+                calories = "250",
+                caloriesAnHour = "600",
+                watts = "180"
             ),
             connectionStatus = ConnectionStatus.Connected
         )
