@@ -129,6 +129,7 @@ class BleRepositoryImpl @Inject constructor(
             .doFinally {
                 activeConnection = null
                 connectDisposable = null
+                operationDisposables.dispose()
                 Timber.tag(TAG).i("Disconnected to $device")
                 connectionStatusChanged(ConnectionStatus.Disconnected)
             }
