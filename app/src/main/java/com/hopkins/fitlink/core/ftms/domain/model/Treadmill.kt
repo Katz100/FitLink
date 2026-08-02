@@ -257,24 +257,17 @@ class Treadmill: Machine<TreadmillData>(
                 heartRate = heartRateBpm ?: current.heartRate,
                 elapsedTime = elapsedTimeSeconds?.toInt() ?: current.elapsedTime,
                 remainingTime = remainingTimeSeconds?.toInt() ?: current.remainingTime,
-                instantaneousSpeed =
-                    speedMph ?: current.instantaneousSpeed,
-                averageSpeed =
-                    averageSpeed ?: current.averageSpeed,
-                totalDistance =
-                    totalDistance ?: current.totalDistance,
-                inclination =
-                    inclinationPercent ?: current.inclination,
-                positiveElevationGain =
-                    positiveGain ?: current.positiveElevationGain,
-                negativeElevationGain =
-                    negativeGain ?: current.negativeElevationGain,
-                instantaneousPace =
-                    instantPace ?: current.instantaneousPace,
-                averagePace =
-                    averagePace ?: current.averagePace,
-                totalEnergy =
-                    totalEnergyKcal ?: current.totalEnergy,
+                energyPerHour = energyPerHourKcal?.toInt() ?: current.energyPerHour,
+                powerOutput = powerOutputWatts?.toInt() ?: current.powerOutput,
+                instantaneousSpeed = speedMph ?: current.instantaneousSpeed,
+                averageSpeed = averageSpeed ?: current.averageSpeed,
+                totalDistance = totalDistance ?: current.totalDistance,
+                inclination = inclinationPercent ?: current.inclination,
+                positiveElevationGain = positiveGain ?: current.positiveElevationGain,
+                negativeElevationGain = negativeGain ?: current.negativeElevationGain,
+                instantaneousPace = instantPace ?: current.instantaneousPace,
+                averagePace = averagePace ?: current.averagePace,
+                totalEnergy = totalEnergyKcal ?: current.totalEnergy,
             )
         }
     }
