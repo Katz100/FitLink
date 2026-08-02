@@ -10,4 +10,6 @@ object FTMSConstants {
     const val REQUEST_CONTROL_POINT = 0x00
     const val OP_RESPONSE_CODE = 0x80
     const val RESULT_SUCCESS = 0x01
+    const val HEART_RATE_MIN = 0
+    const val HEART_RATE_MAX = 255
 }
