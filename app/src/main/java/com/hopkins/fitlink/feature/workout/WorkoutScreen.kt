@@ -1,5 +1,6 @@
 package com.hopkins.fitlink.feature.workout
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -7,43 +8,82 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.hopkins.fitlink.core.data.ConnectionStatus
 import com.hopkins.fitlink.core.ftms.domain.model.MachineUiState
+import com.hopkins.fitlink.core.ui.DisconnectedDialog
 import com.hopkins.fitlink.core.ui.TreadmillView
 
 @Composable
 fun WorkoutScreen(
-    viewModel: WorkoutScreenViewModel = hiltViewModel()
+    viewModel: WorkoutScreenViewModel = hiltViewModel(),
+    onWorkoutEnded: () -> Unit,
 ) {
     val uiState = viewModel.workoutUiState.collectAsStateWithLifecycle().value
+    var showDisconnectedDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(uiState.connectionState) {
-        if (uiState.connectionState == ConnectionStatus.Disconnected) {
-            // show dialog
+        when (uiState.connectionState) {
+            ConnectionStatus.Connected -> showDisconnectedDialog = false
+            is ConnectionStatus.ConnectionError -> showDisconnectedDialog = true
+            ConnectionStatus.ConnectionLoading -> Unit
+            ConnectionStatus.Disconnected -> showDisconnectedDialog = true
         }
+    }
+
+    BackHandler(
+        enabled = true
+    ) {
+
+    }
+
+    if (showDisconnectedDialog) {
+        DisconnectedDialog(
+            onConfirmation = {
+                viewModel.connectToDevice()
+                showDisconnectedDialog = false
+            },
+            onDismissRequest = {
+                showDisconnectedDialog = false
+                onWorkoutEnded()
+            },
+        )
     }
 
     Scaffold(
         modifier = Modifier.fillMaxSize()
     ) { innerPadding ->
-        when (uiState.machineUiState) {
-            MachineUiState.DetectingMachine -> Box(
-                modifier = Modifier.fillMaxSize()
+
+        val isLoading = uiState.connectionState == ConnectionStatus.ConnectionLoading ||
+                    uiState.machineUiState == MachineUiState.DetectingMachine
+
+        if (isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
                     .padding(innerPadding),
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator()
             }
-            is MachineUiState.TreadmillMachine -> {
-                TreadmillView(
-                    modifier = Modifier.padding(innerPadding),
-                    machineState = uiState.machineUiState,
-                    connectionStatus = uiState.connectionState
-                )
+        } else {
+            when (val machineState = uiState.machineUiState) {
+                is MachineUiState.TreadmillMachine -> {
+                    TreadmillView(
+                        modifier = Modifier.padding(innerPadding),
+                        machineState = machineState,
+                        connectionStatus = uiState.connectionState
+                    )
+                }
+
+                MachineUiState.DetectingMachine -> Unit
             }
         }
     }

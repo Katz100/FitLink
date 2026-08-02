@@ -120,8 +120,9 @@ class BleRepositoryImpl @Inject constructor(
     ) {
         stopScanning()
         val device = rxBleClient.getBleDevice(deviceAddress)
-
         connectDisposable?.dispose()
+        connectDisposable = null
+
         operationDisposables.clear()
         activeConnection = null
 
@@ -129,7 +130,7 @@ class BleRepositoryImpl @Inject constructor(
             .doFinally {
                 activeConnection = null
                 connectDisposable = null
-                operationDisposables.dispose()
+                operationDisposables.clear()
                 Timber.tag(TAG).i("Disconnected to $device")
                 connectionStatusChanged(ConnectionStatus.Disconnected)
             }

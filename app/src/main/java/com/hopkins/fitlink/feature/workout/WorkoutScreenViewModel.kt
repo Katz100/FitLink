@@ -8,6 +8,8 @@ import com.hopkins.fitlink.core.data.ConnectionStatus
 import com.hopkins.fitlink.core.ftms.FTMSConstants
 import com.hopkins.fitlink.core.ftms.domain.model.EquipmentType
 import com.hopkins.fitlink.core.ftms.domain.model.Machine
+import com.hopkins.fitlink.core.ftms.domain.model.MachineUiState
+import com.hopkins.fitlink.core.ftms.domain.model.MachineUiState.DetectingMachine
 import com.hopkins.fitlink.core.ftms.domain.model.MachineUiState.TreadmillMachine
 import com.hopkins.fitlink.core.ftms.domain.model.Treadmill
 import com.hopkins.fitlink.core.ftms.factory.createMachine
@@ -37,7 +39,14 @@ class WorkoutScreenViewModel @Inject constructor(
         connectToDevice()
     }
 
-    private fun connectToDevice() {
+    fun connectToDevice() {
+        _workoutUiState.update {
+            it.copy(
+                connectionState = ConnectionStatus.ConnectionLoading,
+                machineUiState = DetectingMachine
+            )
+        }
+
         bleRepository.connectToDevice(
             deviceAddress = deviceAddress,
             connectionStatusChanged = { connectionStatus ->

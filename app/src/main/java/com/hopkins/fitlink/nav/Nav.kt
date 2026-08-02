@@ -24,7 +24,11 @@ fun Nav() {
         }
 
         composable<Screen.ActiveWorkout> {
-            WorkoutScreen()
+            WorkoutScreen(
+                onWorkoutEnded = {
+                    navController.popBackStack()
+                }
+            )
         }
 
     }
