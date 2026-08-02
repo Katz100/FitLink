@@ -9,5 +9,5 @@ data class WorkoutUiState(
     val equipmentType: EquipmentType = EquipmentType.TREADMILL,
     val notificationStatus: NotificationChanged = NotificationChanged.NotificationLoading,
     val connectionState: ConnectionStatus = ConnectionStatus.ConnectionLoading,
-    val machineUiState: MachineUiState = MachineUiState.DetectingMachine
+    val machineUiState: MachineUiState = MachineUiState.DetectingMachine,
 )

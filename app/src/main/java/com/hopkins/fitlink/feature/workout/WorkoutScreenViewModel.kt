@@ -28,6 +28,7 @@ class WorkoutScreenViewModel @Inject constructor(
 
     private val deviceAddress = savedStateHandle.toRoute<Screen.ActiveWorkout>().macAddress
     private var machine: Machine<*>? = null
+    private var maxHeartRate: Int = 0
 
     private val _workoutUiState = MutableStateFlow<WorkoutUiState>(WorkoutUiState())
     val workoutUiState: StateFlow<WorkoutUiState> = _workoutUiState.asStateFlow()
@@ -105,15 +106,19 @@ class WorkoutScreenViewModel @Inject constructor(
             it.copy(
                 machineUiState = when(currentMachine) {
                     is Treadmill -> {
+                        maxHeartRate = maxHeartRate.coerceAtLeast(
+                            currentMachine.machineData?.heartRate?.toInt() ?: 0
+                        )
                         TreadmillMachine(
                             instantaneousSpeed = currentMachine.machineData?.instantaneousSpeed,
-                            heartRate = currentMachine.machineData?.heartRate?.takeIf { it > FTMSConstants.HEART_RATE_MIN && it < FTMSConstants.HEART_RATE_MAX },
+                            heartRate = currentMachine.machineData?.heartRate?.takeIf { it > FTMSConstants.HEART_RATE_MIN && it < FTMSConstants.HEART_RATE_MAX } ?: 0,
                             inclination = currentMachine.machineData?.inclination,
                             elapsedTime = currentMachine.machineData?.elapsedTime,
                             timeRemaining = currentMachine.machineData?.remainingTime,
                             calories = currentMachine.machineData?.totalEnergy?.toString() ?: "--",
                             caloriesAnHour = currentMachine.machineData?.energyPerHour?.toString() ?: "--",
-                            watts = currentMachine.machineData?.powerOutput?.toString() ?: "--"
+                            watts = currentMachine.machineData?.powerOutput?.toString() ?: "--",
+                            maxHeartRate = maxHeartRate.toString()
                         )
                     }
                     else -> return

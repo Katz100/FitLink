@@ -31,6 +31,7 @@ fun TreadmillView(
 ) {
     var showAdditionalDetailsForTime by remember { mutableStateOf(false) }
     var showAdditionalDetailsForCalories by remember { mutableStateOf(false) }
+    var showAdditionalDetailsForHeartRate by remember { mutableStateOf(false) }
 
     Box(
         modifier = modifier
@@ -79,10 +80,11 @@ fun TreadmillView(
                 KpiCard(
                     modifier = Modifier.weight(1f),
                     statItems = listOf(
-                        hashMapOf("Heart Rate" to if (machineState.heartRate == 0) "--" else machineState.heartRate.toString())
+                        hashMapOf("Heart Rate" to if (machineState.heartRate == 0) "--" else machineState.heartRate.toString()),
+                        hashMapOf("Peak Heart Rate" to machineState.maxHeartRate)
                     ),
-                    showAdditionalItems = false,
-                    onShowAdditionalItemsClick = {}
+                    showAdditionalItems = showAdditionalDetailsForHeartRate,
+                    onShowAdditionalItemsClick = { showAdditionalDetailsForHeartRate = ! showAdditionalDetailsForHeartRate }
                 )
                 KpiCard(
                     modifier = Modifier.weight(1f),
@@ -122,7 +124,8 @@ fun TreadMillViewTabletPreview() {
                 inclination = 12.0,
                 calories = "250",
                 caloriesAnHour = "600",
-                watts = "180"
+                watts = "180",
+                maxHeartRate = "170"
             ),
             connectionStatus = ConnectionStatus.Connected
         )
@@ -142,7 +145,8 @@ fun TreadMillViewPhoneLandscapeDarkPreview() {
                     inclination = 12.0,
                     calories = "250",
                     caloriesAnHour = "600",
-                    watts = "180"
+                    watts = "180",
+                    maxHeartRate = "170"
                 ),
                 connectionStatus = ConnectionStatus.Connected
             )
@@ -161,7 +165,8 @@ fun TreadMillViewPhonePortraitPreview() {
                 inclination = 12.0,
                 calories = "250",
                 caloriesAnHour = "600",
-                watts = "180"
+                watts = "180",
+                maxHeartRate = "170"
             ),
             connectionStatus = ConnectionStatus.Connected
         )

@@ -15,5 +15,6 @@ sealed interface MachineUiState {
         val calories: String,
         val caloriesAnHour: String,
         val watts: String,
+        val maxHeartRate: String,
     ): MachineUiState
 }

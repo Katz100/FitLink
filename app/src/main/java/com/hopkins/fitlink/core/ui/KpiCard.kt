@@ -1,5 +1,6 @@
 package com.hopkins.fitlink.core.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -58,27 +59,24 @@ fun KpiCard(
             for ((key, value) in statItems.first()) {
                 MetricCard(
                     label = key,
-                    value = value
+                    value = value,
+                    onClick = onShowAdditionalItemsClick
                 )
             }
 
-            IconButton(
+            Icon(
                 modifier = Modifier.align(Alignment.TopEnd),
-                onClick = onShowAdditionalItemsClick
-            ) {
-                Icon(
-                    imageVector = if (showAdditionalItems) {
-                        Icons.Default.KeyboardArrowDown
-                    } else {
-                        Icons.Default.KeyboardArrowUp
-                    },
-                    contentDescription = if (showAdditionalItems) {
-                        "Hide additional metrics"
-                    } else {
-                        "Show additional metrics"
-                    }
-                )
-            }
+                imageVector = if (showAdditionalItems) {
+                    Icons.Default.KeyboardArrowDown
+                } else {
+                    Icons.Default.KeyboardArrowUp
+                },
+                contentDescription = if (showAdditionalItems) {
+                    "Hide additional metrics"
+                } else {
+                    "Show additional metrics"
+                }
+            )
         }
     }
 }
@@ -90,10 +88,12 @@ fun MetricCard(
     modifier: Modifier = Modifier,
     backgroundColor: Color = MaterialTheme.colorScheme.surfaceVariant,
     valueColor: Color = MaterialTheme.colorScheme.onSurface,
-    labelColor: Color = MaterialTheme.colorScheme.onSurfaceVariant
+    labelColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
+    onClick: () -> Unit = {},
 ) {
     Card(
-        modifier = modifier,
+        modifier = modifier
+            .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(
             containerColor = backgroundColor
         ),
