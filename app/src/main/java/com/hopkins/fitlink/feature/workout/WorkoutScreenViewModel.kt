@@ -82,7 +82,7 @@ class WorkoutScreenViewModel @Inject constructor(
         deviceAddress: String,
         characteristicUUID: UUID
     ) {
-        bleRepository.connectAndSubscribeToCharacteristic(
+        bleRepository.subscribeToCharacteristic(
             deviceAddress = deviceAddress,
             characteristic = characteristicUUID,
             onBytesReceived = { bytes ->

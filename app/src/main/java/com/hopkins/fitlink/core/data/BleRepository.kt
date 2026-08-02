@@ -28,7 +28,7 @@ interface BleRepository {
      * @param onNotificationChanged The lambda that is called when there is a change in the notification.
      * Passes a NotificationChanged object as a parameter
      */
-    fun connectAndSubscribeToCharacteristic(
+    fun subscribeToCharacteristic(
         characteristic: UUID,
         deviceAddress: String,
         onBytesReceived: (ByteArray) -> Unit,

@@ -72,7 +72,7 @@ class BleRepositoryImpl @Inject constructor(
             )
     }
 
-    override fun connectAndSubscribeToCharacteristic(
+    override fun subscribeToCharacteristic(
         characteristic: UUID,
         deviceAddress: String,
         onBytesReceived: (ByteArray) -> Unit,
