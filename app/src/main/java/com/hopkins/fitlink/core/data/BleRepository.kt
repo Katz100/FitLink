@@ -60,5 +60,7 @@ interface BleRepository {
     )
 
     fun isBleEnabled(): Boolean
+
+    fun stopScanning()
 }
 

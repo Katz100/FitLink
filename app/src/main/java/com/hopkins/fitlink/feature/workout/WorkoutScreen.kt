@@ -32,7 +32,7 @@ fun WorkoutScreen(
     LaunchedEffect(uiState.connectionState) {
         when (uiState.connectionState) {
             ConnectionStatus.Connected -> showDisconnectedDialog = false
-            is ConnectionStatus.ConnectionError -> showDisconnectedDialog = true
+            is ConnectionStatus.ConnectionError -> Unit
             ConnectionStatus.ConnectionLoading -> Unit
             ConnectionStatus.Disconnected -> showDisconnectedDialog = true
         }

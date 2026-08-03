@@ -300,7 +300,7 @@ class BleRepositoryImpl @Inject constructor(
         return state != RxBleClient.State.BLUETOOTH_NOT_ENABLED
     }
 
-    private fun stopScanning() {
+    override fun stopScanning() {
         scanDisposable?.dispose()
         scanDisposable = null
     }
