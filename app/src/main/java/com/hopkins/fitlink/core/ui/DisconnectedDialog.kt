@@ -21,8 +21,8 @@ fun DisconnectedDialog(
             Text(text = "Disconnected")
         },
         text = {
-            Text(text = "The connection to the fitness equipment was lost.\n" +
-                    "Check that the equipment is powered on and nearby, \n" +
+            Text(text = "The connection to the fitness equipment was lost." +
+                    "Check that the equipment is powered on and nearby," +
                     "then try reconnecting.")
         },
         onDismissRequest = {
