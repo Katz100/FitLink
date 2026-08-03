@@ -20,6 +20,10 @@ class HomeScreenViewModel @Inject constructor(
     private val _scanning = MutableStateFlow<Boolean>(false)
     val scanning: StateFlow<Boolean> = _scanning.asStateFlow()
 
+    init {
+        scanForDevices()
+    }
+
     fun scanForDevices() {
         _scanning.value = true
         clearDevices()
@@ -41,6 +45,10 @@ class HomeScreenViewModel @Inject constructor(
 
     fun isBleEnabled(): Boolean {
         return bleRepository.isBleEnabled()
+    }
+
+    fun stopScanning() {
+        bleRepository.stopScanning()
     }
 
 }

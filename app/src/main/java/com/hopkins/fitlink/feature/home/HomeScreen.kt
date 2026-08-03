@@ -134,6 +134,7 @@ fun HomeScreen(
                         deviceNameTextStyle = MaterialTheme.typography.titleMedium,
                         deviceAddressTextStyle = MaterialTheme.typography.bodySmall,
                         onConnectClicked = {
+                            viewModel.stopScanning()
                             onDeviceClicked(device.macAddress)
                         }
                     )
