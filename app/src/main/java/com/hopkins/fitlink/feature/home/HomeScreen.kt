@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -27,6 +28,7 @@ import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -46,6 +48,7 @@ fun HomeScreen(
     val context = LocalContext.current
     val devices = viewModel.devices.collectAsStateWithLifecycle().value
     val isScanning = viewModel.scanning.collectAsStateWithLifecycle().value
+    val uiState = viewModel.homeScreenUiState.collectAsStateWithLifecycle().value
 
     val bluetoothPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
@@ -55,6 +58,12 @@ fun HomeScreen(
             Log.i("TAG", "Bluetooth permissions granted")
         } else {
             Log.i("TAG", "Bluetooth permissions denied: $permissions")
+        }
+    }
+
+    LaunchedEffect(uiState.scannedResult) {
+        if (uiState.scannedResult is ScannedResult.NoDevicesFound) {
+            Toast.makeText(context, "No devices found", Toast.LENGTH_SHORT).show()
         }
     }
 

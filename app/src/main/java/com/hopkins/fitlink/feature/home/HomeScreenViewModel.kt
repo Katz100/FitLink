@@ -7,6 +7,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @HiltViewModel
@@ -20,12 +21,20 @@ class HomeScreenViewModel @Inject constructor(
     private val _scanning = MutableStateFlow<Boolean>(false)
     val scanning: StateFlow<Boolean> = _scanning.asStateFlow()
 
+    private val _homeUiState = MutableStateFlow<HomeScreenUiState>(HomeScreenUiState())
+    val homeScreenUiState: StateFlow<HomeScreenUiState> = _homeUiState.asStateFlow()
+
     init {
         scanForDevices()
     }
 
     fun scanForDevices() {
         _scanning.value = true
+        _homeUiState.update {
+            it.copy(
+                scannedResult = ScannedResult.ScanningDevices
+            )
+        }
         clearDevices()
         bleRepository.scanDevices(
             onDeviceScanned = { device ->
@@ -34,7 +43,19 @@ class HomeScreenViewModel @Inject constructor(
                 }
             },
             onScanningFinished = {
+                _homeUiState.update {
+                    it.copy(
+                        scannedResult = ScannedResult.ScanNotInProgress
+                    )
+                }
                 _scanning.value = false
+                if (_devices.value.isEmpty()) {
+                    _homeUiState.update {
+                        it.copy(
+                            scannedResult = ScannedResult.NoDevicesFound
+                        )
+                    }
+                }
             }
         )
     }
@@ -50,5 +71,10 @@ class HomeScreenViewModel @Inject constructor(
     fun stopScanning() {
         bleRepository.stopScanning()
     }
+}
 
+sealed interface ScannedResult {
+    data object ScanningDevices: ScannedResult
+    data object ScanNotInProgress: ScannedResult
+    data object NoDevicesFound: ScannedResult
 }
