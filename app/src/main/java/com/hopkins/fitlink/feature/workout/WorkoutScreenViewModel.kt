@@ -8,7 +8,6 @@ import com.hopkins.fitlink.core.data.ConnectionStatus
 import com.hopkins.fitlink.core.ftms.FTMSConstants
 import com.hopkins.fitlink.core.ftms.domain.model.EquipmentType
 import com.hopkins.fitlink.core.ftms.domain.model.Machine
-import com.hopkins.fitlink.core.ftms.domain.model.MachineUiState
 import com.hopkins.fitlink.core.ftms.domain.model.MachineUiState.DetectingMachine
 import com.hopkins.fitlink.core.ftms.domain.model.MachineUiState.TreadmillMachine
 import com.hopkins.fitlink.core.ftms.domain.model.Treadmill
@@ -49,7 +48,7 @@ class WorkoutScreenViewModel @Inject constructor(
         }
     }
 
-    fun disconnectToDevice() {
+    fun disconnectFromDevice() {
         bleRepository.disconnectFromDevice()
     }
 

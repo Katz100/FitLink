@@ -5,7 +5,7 @@ import com.hopkins.fitlink.core.data.BleDeviceModel
 import com.hopkins.fitlink.core.data.BleRepository
 import com.hopkins.fitlink.core.data.ConnectionStatus
 import com.hopkins.fitlink.core.data.NotificationChanged
-import com.hopkins.fitlink.core.data.toBleDevice
+import com.hopkins.fitlink.core.data.toBleDeviceModel
 import com.hopkins.fitlink.core.ftms.FTMSConstants
 import com.hopkins.fitlink.core.ftms.domain.model.EquipmentType
 import com.polidea.rxandroidble3.RxBleClient
@@ -64,7 +64,7 @@ class BleRepositoryImpl @Inject constructor(
             }
             .subscribe(
                 { scanResult ->
-                    onDeviceScanned(scanResult.bleDevice.toBleDevice())
+                    onDeviceScanned(scanResult.bleDevice.toBleDeviceModel())
                 },
                 { throwable ->
                     Timber.tag(TAG).e(throwable, "There was an error scanning devices")

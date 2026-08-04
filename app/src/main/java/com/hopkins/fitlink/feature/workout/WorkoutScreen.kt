@@ -53,7 +53,7 @@ fun WorkoutScreen(
     }
 
     BackHandler {
-        viewModel.disconnectToDevice()
+        viewModel.disconnectFromDevice()
         onWorkoutEnded()
     }
 

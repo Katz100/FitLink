@@ -7,7 +7,7 @@ data class BleDeviceModel(
     val macAddress: String,
 )
 
-fun RxBleDevice.toBleDevice(): BleDeviceModel {
+fun RxBleDevice.toBleDeviceModel(): BleDeviceModel {
     return BleDeviceModel(
         name = this.name ?: "N/A",
         macAddress = this.macAddress
