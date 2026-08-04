@@ -1,5 +1,6 @@
 package com.hopkins.fitlink.feature.workout
 
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -35,6 +37,7 @@ fun WorkoutScreen(
 ) {
     val uiState = viewModel.workoutUiState.collectAsStateWithLifecycle().value
     var showDisconnectedDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     LaunchedEffect(uiState.connectionState) {
         when (uiState.connectionState) {
@@ -45,10 +48,13 @@ fun WorkoutScreen(
         }
     }
 
-    BackHandler(
-        enabled = true
-    ) {
+    LaunchedEffect(uiState.rxConnectionState) {
+        Toast.makeText(context, uiState.rxConnectionState.toString(), Toast.LENGTH_SHORT).show()
+    }
 
+    BackHandler {
+        viewModel.disconnectToDevice()
+        onWorkoutEnded()
     }
 
     if (showDisconnectedDialog) {
@@ -68,8 +74,7 @@ fun WorkoutScreen(
         modifier = Modifier.fillMaxSize()
     ) { innerPadding ->
 
-        val isLoading = uiState.connectionState == ConnectionStatus.ConnectionLoading ||
-                    uiState.machineUiState == MachineUiState.DetectingMachine
+        val isLoading = uiState.connectionState == ConnectionStatus.ConnectionLoading
 
         if (isLoading) {
             Box(
@@ -88,13 +93,7 @@ fun WorkoutScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
-                        text = if (
-                            uiState.connectionState is ConnectionStatus.ConnectionLoading
-                        ) {
-                            "Connecting to machine..."
-                        } else {
-                            "Subscribing to machine characteristic..."
-                        },
+                        text = "Connecting to machine...",
                         textAlign = TextAlign.Center
                     )
                 }
@@ -102,6 +101,9 @@ fun WorkoutScreen(
         } else {
             when (val machineState = uiState.machineUiState) {
                 is MachineUiState.TreadmillMachine -> {
+                    LaunchedEffect(uiState.notificationStatus) {
+                        Toast.makeText(context, uiState.notificationStatus.toString(), Toast.LENGTH_SHORT).show()
+                    }
                     TreadmillView(
                         modifier = Modifier.padding(innerPadding),
                         machineState = machineState,
@@ -109,7 +111,30 @@ fun WorkoutScreen(
                     )
                 }
 
-                MachineUiState.DetectingMachine -> Unit
+                MachineUiState.DetectingMachine -> {
+                    // create reusable composable for custom circular progress indicator
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            CircularProgressIndicator()
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            Text(
+                                text = "Identifying machine type...",
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                }
             }
         }
     }

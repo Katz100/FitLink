@@ -37,6 +37,20 @@ class WorkoutScreenViewModel @Inject constructor(
 
     init {
         connectToDevice()
+
+        bleRepository.subscribeToConnectionState(
+            deviceAddress = deviceAddress,
+        ) { connectionState ->
+            _workoutUiState.update {
+                it.copy(
+                    rxConnectionState = connectionState
+                )
+            }
+        }
+    }
+
+    fun disconnectToDevice() {
+        bleRepository.disconnectFromDevice()
     }
 
     fun connectToDevice() {

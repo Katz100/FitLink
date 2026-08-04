@@ -1,6 +1,7 @@
 package com.hopkins.fitlink.core.data
 
 import com.hopkins.fitlink.core.ftms.domain.model.EquipmentType
+import com.polidea.rxandroidble3.RxBleConnection
 import java.util.UUID
 
 interface BleRepository {
@@ -40,6 +41,7 @@ interface BleRepository {
         connectionStatusChanged: (ConnectionStatus) -> Unit,
     )
 
+    fun disconnectFromDevice()
     /**
      * Discovers characteristics for a device
      * @param deviceAddress The device you want to find characteristics for
@@ -50,6 +52,11 @@ interface BleRepository {
         deviceAddress: String,
         onEquipmentCharacteristicFound: (EquipmentType) -> Unit,
         onFinished: () -> Unit,
+    )
+
+    fun subscribeToConnectionState(
+        deviceAddress: String,
+        onConnectionStateChange: (RxBleConnection.RxBleConnectionState) -> Unit,
     )
 
     fun writeToControlPoint()

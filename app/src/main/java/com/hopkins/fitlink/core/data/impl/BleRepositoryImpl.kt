@@ -118,8 +118,8 @@ class BleRepositoryImpl @Inject constructor(
         deviceAddress: String,
         connectionStatusChanged: (ConnectionStatus) -> Unit
     ) {
-        stopScanning()
         val device = rxBleClient.getBleDevice(deviceAddress)
+
         connectDisposable?.dispose()
         connectDisposable = null
 
@@ -148,6 +148,25 @@ class BleRepositoryImpl @Inject constructor(
                     connectionStatusChanged(ConnectionStatus.ConnectionError(it))
                 }
             )
+    }
+
+    override fun disconnectFromDevice() {
+        val connectionDisposable = connectDisposable
+
+        if (connectionDisposable == null || connectionDisposable.isDisposed) {
+            Timber.tag(TAG).i("No active BLE connection to disconnect")
+
+            operationDisposables.clear()
+            activeConnection = null
+            connectDisposable = null
+            return
+        }
+
+        Timber.tag(TAG).i("Disconnecting active BLE connection")
+        operationDisposables.clear()
+        connectionDisposable.dispose()
+        connectDisposable = null
+        activeConnection = null
     }
 
     override fun discoverCharacteristic(
@@ -200,6 +219,25 @@ class BleRepositoryImpl @Inject constructor(
                 },
             )
 
+        operationDisposables.add(disposable)
+    }
+
+    override fun subscribeToConnectionState(
+        deviceAddress: String,
+        onConnectionStateChange: (RxBleConnection.RxBleConnectionState) -> Unit,
+    ) {
+        val device = rxBleClient.getBleDevice(deviceAddress)
+
+        val disposable = device.observeConnectionStateChanges()
+            .subscribe (
+                { connectionState ->
+                    onConnectionStateChange(connectionState)
+                },
+
+                { t ->
+                    Timber.tag(TAG).e("Error with connection state: $t")
+                }
+            )
         operationDisposables.add(disposable)
     }
 
