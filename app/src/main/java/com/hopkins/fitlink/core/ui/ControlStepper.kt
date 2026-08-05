@@ -150,7 +150,7 @@ private fun StepperButton(
             modifier = Modifier.size(iconSize),
             imageVector = imageVector,
             contentDescription = "Step icon",
-            tint = Color.Blue
+            tint = Color.Magenta
         )
     }
 }

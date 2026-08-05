@@ -113,7 +113,7 @@ fun WorkoutScreen(
                 }
 
                 MachineUiState.DetectingMachine -> {
-                    // create reusable composable for custom circular progress indicator
+                    // TODO: create reusable composable for custom circular progress indicator
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
