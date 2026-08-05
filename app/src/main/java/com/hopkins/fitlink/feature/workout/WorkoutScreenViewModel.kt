@@ -93,6 +93,26 @@ class WorkoutScreenViewModel @Inject constructor(
                     EquipmentType.STAIR_MASTER -> TODO()
                 }
                 machine = createMachine(_workoutUiState.value.equipmentType)
+                _workoutUiState.update {
+                    it.copy(
+                        machineUiState = when(machine) {
+                            is Treadmill -> {
+                                TreadmillMachine(
+                                    instantaneousSpeed = null,
+                                    heartRate = null,
+                                    inclination = null,
+                                    elapsedTime = null,
+                                    timeRemaining = null,
+                                    calories = "--",
+                                    caloriesAnHour = "--",
+                                    watts = "--",
+                                    maxHeartRate = "--"
+                                )
+                            }
+                            else -> TODO()
+                        }
+                    )
+                }
                 subscribeToCharacteristic(deviceAddress, characteristic)
             }
         )

@@ -48,6 +48,10 @@ fun WorkoutScreen(
         }
     }
 
+    LaunchedEffect(uiState.notificationStatus) {
+        Toast.makeText(context, uiState.notificationStatus.toString(), Toast.LENGTH_SHORT).show()
+    }
+
     LaunchedEffect(uiState.rxConnectionState) {
         Toast.makeText(context, uiState.rxConnectionState.toString(), Toast.LENGTH_SHORT).show()
     }
@@ -101,9 +105,6 @@ fun WorkoutScreen(
         } else {
             when (val machineState = uiState.machineUiState) {
                 is MachineUiState.TreadmillMachine -> {
-                    LaunchedEffect(uiState.notificationStatus) {
-                        Toast.makeText(context, uiState.notificationStatus.toString(), Toast.LENGTH_SHORT).show()
-                    }
                     TreadmillView(
                         modifier = Modifier.padding(innerPadding),
                         machineState = machineState,
