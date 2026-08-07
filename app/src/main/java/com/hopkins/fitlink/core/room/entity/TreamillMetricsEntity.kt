@@ -3,8 +3,9 @@ package com.hopkins.fitlink.core.room.entity
 import androidx.room3.Entity
 import androidx.room3.PrimaryKey
 import com.hopkins.fitlink.core.ftms.domain.model.MachineUiState
+import com.hopkins.fitlink.core.room.RoomConstants
 
-@Entity(tableName = "treadmill_metrics")
+@Entity(tableName = RoomConstants.TREADMILL_TABLE)
 data class TreadmillMetricsEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
