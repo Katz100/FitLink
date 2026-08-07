@@ -1,11 +1,11 @@
 package com.hopkins.fitlink.core.data.impl
 
 import android.os.ParcelUuid
-import com.hopkins.fitlink.core.data.BleDeviceModel
+import com.hopkins.fitlink.core.ftms.domain.model.BleDeviceModel
 import com.hopkins.fitlink.core.data.BleRepository
 import com.hopkins.fitlink.core.data.ConnectionStatus
 import com.hopkins.fitlink.core.data.NotificationChanged
-import com.hopkins.fitlink.core.data.toBleDeviceModel
+import com.hopkins.fitlink.core.ftms.domain.model.toBleDeviceModel
 import com.hopkins.fitlink.core.ftms.FTMSConstants
 import com.hopkins.fitlink.core.ftms.domain.model.EquipmentType
 import com.polidea.rxandroidble3.RxBleClient

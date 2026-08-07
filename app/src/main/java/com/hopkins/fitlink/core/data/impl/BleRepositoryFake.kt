@@ -1,7 +1,7 @@
 package com.hopkins.fitlink.core.data.impl
 
 import android.content.Context
-import com.hopkins.fitlink.core.data.BleDeviceModel
+import com.hopkins.fitlink.core.ftms.domain.model.BleDeviceModel
 import com.hopkins.fitlink.core.data.BleRepository
 import com.hopkins.fitlink.core.data.ConnectionStatus
 import com.hopkins.fitlink.core.data.NotificationChanged
@@ -11,7 +11,6 @@ import com.polidea.rxandroidble3.RxBleConnection
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch

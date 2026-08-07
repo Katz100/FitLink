@@ -1,4 +1,4 @@
-package com.hopkins.fitlink.core.data
+package com.hopkins.fitlink.core.ftms.domain.model
 
 import com.polidea.rxandroidble3.RxBleDevice
 

@@ -1,5 +1,6 @@
 package com.hopkins.fitlink.core.data
 
+import com.hopkins.fitlink.core.ftms.domain.model.BleDeviceModel
 import com.hopkins.fitlink.core.ftms.domain.model.EquipmentType
 import com.polidea.rxandroidble3.RxBleConnection
 import java.util.UUID
