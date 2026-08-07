@@ -107,7 +107,7 @@ fun TreadmillView(
                     String.format(
                         Locale.US,
                         "%.1f",
-                        machineState.instantaneousSpeed
+                        it
                     )
                 } ?: "--"
             )
