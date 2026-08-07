@@ -60,13 +60,6 @@ interface BleRepository {
         onConnectionStateChange: (RxBleConnection.RxBleConnectionState) -> Unit,
     )
 
-    fun writeToControlPoint()
-
-    fun setSpeed(
-        speedInKph: Double,
-        deviceAddress: String
-    )
-
     fun isBleEnabled(): Boolean
 
     fun stopScanning()

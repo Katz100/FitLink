@@ -70,7 +70,6 @@ class WorkoutScreenViewModel @Inject constructor(
                 }
                 if (connectionStatus is ConnectionStatus.Connected) {
                     discoverCharacteristics()
-                    bleRepository.writeToControlPoint()
                 }
             }
         )
@@ -117,9 +116,7 @@ class WorkoutScreenViewModel @Inject constructor(
             }
         )
     }
-    fun updateSpeed() {
-        bleRepository.setSpeed(500.0, deviceAddress)
-    }
+
     private fun subscribeToCharacteristic(
         deviceAddress: String,
         characteristicUUID: UUID
