@@ -18,16 +18,11 @@ import java.util.UUID
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
-class BleRepositoryFake @Inject constructor(
-    @ApplicationContext context: Context,
-) : BleRepository {
+class BleRepositoryFake @Inject constructor() : BleRepository {
 
     companion object {
         private const val deviceName = "TestDevice"
         private const val macAddress = "AA:BB:CC:DD:EE:FF"
-        private const val rrsi = -42
-        private val serviceUuid = UUID.fromString(FTMSConstants.FTMS_MACHINE)
-        private val characteristicUuid = UUID.fromString(FTMSConstants.TREADMILL_CHARACTERISTIC)
     }
 
     val scope = CoroutineScope(Dispatchers.Main)
@@ -105,13 +100,6 @@ override fun subscribeToConnectionState(
     deviceAddress: String,
     onConnectionStateChange: (RxBleConnection.RxBleConnectionState) -> Unit
 ) {
-}
-
-override fun writeToControlPoint() {
-}
-
-override fun setSpeed(speedInKph: Double, deviceAddress: String) {
-    TODO("Not yet implemented")
 }
 
 override fun isBleEnabled(): Boolean {
