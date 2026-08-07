@@ -5,6 +5,7 @@ plugins {
     kotlin("plugin.serialization") version "2.0.21"
     id("com.google.dagger.hilt.android")
     id("org.jetbrains.kotlin.kapt")
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -100,4 +101,10 @@ dependencies {
     testImplementation (libs.robolectric)
     testImplementation (libs.mockclient)
     testImplementation (libs.mockito.core)
+
+    // room
+    val room_version = "3.0.1"
+
+    implementation("androidx.room3:room3-runtime:$room_version")
+    ksp("androidx.room3:room3-compiler:$room_version")
 }
