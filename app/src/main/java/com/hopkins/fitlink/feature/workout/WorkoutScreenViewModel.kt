@@ -149,7 +149,10 @@ class WorkoutScreenViewModel @Inject constructor(
                 machineUiState = when(currentMachine) {
                     is Treadmill -> {
                         maxHeartRate = maxHeartRate.coerceAtLeast(
-                            currentMachine.machineData?.heartRate?.toInt() ?: 0
+                            currentMachine.machineData?.heartRate?.toInt()
+                                ?.takeIf {
+                                    it > FTMSConstants.HEART_RATE_MIN && it < FTMSConstants.HEART_RATE_MAX
+                                } ?: 0
                         )
                         TreadmillMachine(
                             instantaneousSpeed = currentMachine.machineData?.instantaneousSpeed,

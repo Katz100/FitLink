@@ -80,7 +80,7 @@ fun TreadmillView(
                 KpiCard(
                     modifier = Modifier.weight(1f),
                     statItems = listOf(
-                        hashMapOf("Heart Rate" to if (machineState.heartRate == 0) "--" else machineState.heartRate.toString()),
+                        hashMapOf("Heart Rate" to if (machineState.heartRate == 0) "--" else machineState.heartRate?.toString() ?: "--"),
                         hashMapOf("Peak Heart Rate" to machineState.maxHeartRate)
                     ),
                     showAdditionalItems = showAdditionalDetailsForHeartRate,
@@ -103,11 +103,13 @@ fun TreadmillView(
                 modifier = Modifier.weight(1f),
                 heading = "Speed",
                 unit = "MPH",
-                value = String.format(
-                    Locale.US,
-                    "%.1f",
-                    machineState.instantaneousSpeed
-                )
+                value = machineState.instantaneousSpeed?.let {
+                    String.format(
+                        Locale.US,
+                        "%.1f",
+                        machineState.instantaneousSpeed
+                    )
+                } ?: "--"
             )
         }
     }
