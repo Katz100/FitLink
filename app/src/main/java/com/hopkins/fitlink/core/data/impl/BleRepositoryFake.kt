@@ -51,63 +51,64 @@ class BleRepositoryFake @Inject constructor() : BleRepository {
         )
     }
 
-override fun scanDevices(
-    onDeviceScanned: (BleDeviceModel) -> Unit,
-    onScanningFinished: () -> Unit
-) {
-    val device = BleDeviceModel(name = deviceName, macAddress = macAddress)
-    onDeviceScanned(device)
-    onScanningFinished
-}
+    override fun scanDevices(
+        onDeviceScanned: (BleDeviceModel) -> Unit,
+        onScanningFinished: () -> Unit
+    ) {
+        val device = BleDeviceModel(name = deviceName, macAddress = macAddress)
+        onDeviceScanned(device)
+        onScanningFinished
+    }
 
-override fun subscribeToCharacteristic(
-    characteristic: UUID,
-    deviceAddress: String,
-    onBytesReceived: (ByteArray) -> Unit,
-    onNotificationChanged: (NotificationChanged) -> Unit
-) {
-    val speedFlow = flowOf(speedPacket(2.5), speedPacket(2.6), speedPacket(2.7), speedPacket(2.8))
-    onNotificationChanged(NotificationChanged.NotificationCreated)
-    scope.launch {
-        speedFlow.collect { bytes ->
-            onBytesReceived(bytes)
-            delay(1_000)
+    override fun subscribeToCharacteristic(
+        characteristic: UUID,
+        deviceAddress: String,
+        onBytesReceived: (ByteArray) -> Unit,
+        onNotificationChanged: (NotificationChanged) -> Unit
+    ) {
+        val speedFlow =
+            flowOf(speedPacket(2.5), speedPacket(2.6), speedPacket(2.7), speedPacket(2.8))
+        onNotificationChanged(NotificationChanged.NotificationCreated)
+        scope.launch {
+            speedFlow.collect { bytes ->
+                onBytesReceived(bytes)
+                delay(1_000)
+            }
         }
     }
-}
 
-override fun connectToDevice(
-    deviceAddress: String,
-    connectionStatusChanged: (ConnectionStatus) -> Unit
-) {
-    connectionStatusChanged(ConnectionStatus.Connected)
-}
+    override fun connectToDevice(
+        deviceAddress: String,
+        connectionStatusChanged: (ConnectionStatus) -> Unit
+    ) {
+        connectionStatusChanged(ConnectionStatus.Connected)
+    }
 
-override fun disconnectFromDevice() {
+    override fun disconnectFromDevice() {
 
-}
+    }
 
-override fun discoverCharacteristic(
-    deviceAddress: String,
-    onEquipmentCharacteristicFound: (EquipmentType) -> Unit,
-    onFinished: () -> Unit
-) {
-    onEquipmentCharacteristicFound(EquipmentType.TREADMILL)
-    onFinished()
-}
+    override fun discoverCharacteristic(
+        deviceAddress: String,
+        onEquipmentCharacteristicFound: (EquipmentType) -> Unit,
+        onFinished: () -> Unit
+    ) {
+        onEquipmentCharacteristicFound(EquipmentType.TREADMILL)
+        onFinished()
+    }
 
-override fun subscribeToConnectionState(
-    deviceAddress: String,
-    onConnectionStateChange: (RxBleConnection.RxBleConnectionState) -> Unit
-) {
-}
+    override fun subscribeToConnectionState(
+        deviceAddress: String,
+        onConnectionStateChange: (RxBleConnection.RxBleConnectionState) -> Unit
+    ) {
+    }
 
-override fun isBleEnabled(): Boolean {
-    return true
-}
+    override fun isBleEnabled(): Boolean {
+        return true
+    }
 
-override fun stopScanning() {
+    override fun stopScanning() {
 
-}
+    }
 
 }
