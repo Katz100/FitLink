@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room3.Room
 import androidx.sqlite.driver.AndroidSQLiteDriver
 import com.hopkins.fitlink.core.room.AppDatabase
+import com.hopkins.fitlink.core.room.dao.TreadmillDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,4 +22,10 @@ object RoomModule {
     ): AppDatabase = Room.databaseBuilder<AppDatabase>(context, "fit-link")
                 .setDriver(AndroidSQLiteDriver())
                 .build()
+
+    @Singleton
+    @Provides
+    fun provideTreadmillDao(
+        db: AppDatabase
+    ): TreadmillDao = db.treadmillDao()
 }
