@@ -77,11 +77,13 @@ fun HomeScreen(
                 actions = {
                     Button(
                         onClick = {
-                            if(!viewModel.isBleEnabled()) {
+                            if (!viewModel.isBleEnabled()) {
                                 if (ContextCompat.checkSelfPermission(
                                         context, Manifest.permission.BLUETOOTH_CONNECT
-                                ) == PackageManager.PERMISSION_GRANTED) {
-                                    val enableBleIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+                                    ) == PackageManager.PERMISSION_GRANTED
+                                ) {
+                                    val enableBleIntent =
+                                        Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
                                     context.startActivity(enableBleIntent)
                                 }
                             } else if (FitBLE.isBLEPermissionsGranted(context)) {
@@ -129,25 +131,21 @@ fun HomeScreen(
                 }
             }
             items(devices.toList(), key = { it.macAddress }) { device ->
-                if (ContextCompat.checkSelfPermission(
-                        context, Manifest.permission.BLUETOOTH_SCAN
-                ) == PackageManager.PERMISSION_GRANTED) {
-                    DeviceItem(
-                        icon = Icons.Default.Settings,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(100.dp)
-                            .padding(16.dp),
-                        deviceName = device.name,
-                        deviceAddress = device.macAddress,
-                        deviceNameTextStyle = MaterialTheme.typography.titleMedium,
-                        deviceAddressTextStyle = MaterialTheme.typography.bodySmall,
-                        onConnectClicked = {
-                            viewModel.stopScanning()
-                            onDeviceClicked(device.macAddress)
-                        }
-                    )
-                }
+                DeviceItem(
+                    icon = Icons.Default.Settings,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp)
+                        .padding(16.dp),
+                    deviceName = device.name,
+                    deviceAddress = device.macAddress,
+                    deviceNameTextStyle = MaterialTheme.typography.titleMedium,
+                    deviceAddressTextStyle = MaterialTheme.typography.bodySmall,
+                    onConnectClicked = {
+                        viewModel.stopScanning()
+                        onDeviceClicked(device.macAddress)
+                    }
+                )
             }
         }
     }
