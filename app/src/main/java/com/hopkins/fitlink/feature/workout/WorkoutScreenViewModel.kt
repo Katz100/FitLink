@@ -18,15 +18,20 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import timber.log.Timber
 import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
 class WorkoutScreenViewModel @Inject constructor(
     private val bleRepository: BleRepository,
+
     savedStateHandle: SavedStateHandle,
 ): ViewModel() {
 
+    companion object {
+        private const val TAG = "WorkoutScreenViewModel"
+    }
     private val deviceAddress = savedStateHandle.toRoute<Screen.ActiveWorkout>().macAddress
     private var machine: Machine<*>? = null
     private var maxHeartRate: Int = 0
@@ -70,6 +75,21 @@ class WorkoutScreenViewModel @Inject constructor(
                 }
                 if (connectionStatus is ConnectionStatus.Connected) {
                     discoverCharacteristics()
+                    val statusCharacteristic = UUID.fromString(FTMSConstants.FITNESS_MACHINE_STATUS)
+                    bleRepository.subscribeToCharacteristic(
+                        characteristic = statusCharacteristic,
+                        deviceAddress = deviceAddress,
+                        onBytesReceived = { bytes ->
+                            val hex = bytes.joinToString(separator = " ") { byte ->
+                                "%02X".format(byte.toInt() and 0xFF)
+                            }
+
+                            Timber.tag(TAG).i("Status: Received bytes hex: $hex")
+                        },
+                        onNotificationChanged = {
+                            Timber.tag(TAG).i("Status changed: $it")
+                        }
+                    )
                 }
             }
         )
