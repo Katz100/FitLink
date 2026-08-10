@@ -3,6 +3,14 @@ package com.hopkins.fitlink.nav
 import kotlinx.serialization.Serializable
 
 sealed interface Screen {
+    companion object {
+        val BottomDestinations = listOf(
+            Home,
+            History,
+            Settings
+        )
+    }
+
     @Serializable
     object Home: Screen
 

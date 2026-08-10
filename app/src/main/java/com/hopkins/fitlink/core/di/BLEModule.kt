@@ -7,6 +7,7 @@ import com.hopkins.fitlink.core.ble.FitBluetoothLeScanner
 import com.hopkins.fitlink.core.ble.FitBluetoothScannerImpl
 import com.hopkins.fitlink.core.data.BleRepository
 import com.hopkins.fitlink.core.data.TreadmillRepository
+import com.hopkins.fitlink.core.data.impl.BleRepositoryFake
 import com.hopkins.fitlink.core.data.impl.BleRepositoryImpl
 import com.hopkins.fitlink.core.data.impl.TreadmillRepositoryImpl
 import com.polidea.rxandroidble3.RxBleClient
@@ -46,7 +47,7 @@ abstract class BluetoothScannerBindModule {
 
     @Binds
     abstract fun bindBleRepository(
-        impl: BleRepositoryImpl
+        impl: BleRepositoryFake
     ): BleRepository
 
     @Binds
