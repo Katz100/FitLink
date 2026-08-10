@@ -5,18 +5,18 @@ import androidx.room3.Insert
 import androidx.room3.OnConflictStrategy
 import androidx.room3.Query
 import com.hopkins.fitlink.core.room.RoomConstants
-import com.hopkins.fitlink.core.room.entity.TreadmillMetricsEntity
+import com.hopkins.fitlink.core.room.entity.TreadmillSessionEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TreadmillDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertTreadmillMetric(treadmillMetricsEntity: TreadmillMetricsEntity)
+    suspend fun insertTreadmillSession(treadmillSessionEntity: TreadmillSessionEntity)
 
     @Query(
         """
             SELECT * FROM ${RoomConstants.TREADMILL_TABLE}
         """
     )
-    fun getAllTreadmillMetrics(): Flow<List<TreadmillMetricsEntity>>
+    fun getAllTreadmillSessions(): Flow<List<TreadmillSessionEntity>>
 }

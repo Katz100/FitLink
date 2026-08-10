@@ -5,7 +5,7 @@ import androidx.room3.PrimaryKey
 import com.hopkins.fitlink.core.room.RoomConstants
 
 @Entity(tableName = RoomConstants.TREADMILL_TABLE)
-data class TreadmillMetricsEntity(
+data class TreadmillSessionEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
 
@@ -42,8 +42,8 @@ data class TreadmillSessionDomain(
     val timestamp: Long = System.currentTimeMillis()
 )
 
-fun TreadmillSessionDomain.toEntity(): TreadmillMetricsEntity =
-    TreadmillMetricsEntity(
+fun TreadmillSessionDomain.toEntity(): TreadmillSessionEntity =
+    TreadmillSessionEntity(
         id = id,
         avgSpeed = avgSpeed,
         maxSpeed = maxSpeed,
@@ -60,7 +60,7 @@ fun TreadmillSessionDomain.toEntity(): TreadmillMetricsEntity =
         timestamp = timestamp
     )
 
-fun TreadmillMetricsEntity.toDomain(): TreadmillSessionDomain =
+fun TreadmillSessionEntity.toDomain(): TreadmillSessionDomain =
     TreadmillSessionDomain(
         id = id,
         avgSpeed = avgSpeed,
