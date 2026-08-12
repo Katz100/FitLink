@@ -13,4 +13,12 @@ object FTMSConstants {
     const val RESULT_SUCCESS = 0x01
     const val HEART_RATE_MIN = 0
     const val HEART_RATE_MAX = 250
+
+    const val FMS_RESET = 0x01
+    const val FMS_STOPPED_OR_PAUSED = 0x02
+    const val FMS_STOPPED_BY_SAFETY_KEY = 0x03
+    const val FMS_RESUMED = 0x04
+    const val FMS_PAUSED = 0x02
+    const val FMS_STOPPED = 0x01
+
 }

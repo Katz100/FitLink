@@ -1,14 +1,16 @@
 package com.hopkins.fitlink.core.data.impl
 
-import android.content.Context
 import com.hopkins.fitlink.core.ftms.domain.model.BleDeviceModel
 import com.hopkins.fitlink.core.data.BleRepository
 import com.hopkins.fitlink.core.data.ConnectionStatus
 import com.hopkins.fitlink.core.data.NotificationChanged
 import com.hopkins.fitlink.core.ftms.FTMSConstants
+import com.hopkins.fitlink.core.ftms.FTMSConstants.FMS_PAUSED
+import com.hopkins.fitlink.core.ftms.FTMSConstants.FMS_RESET
+import com.hopkins.fitlink.core.ftms.FTMSConstants.FMS_RESUMED
+import com.hopkins.fitlink.core.ftms.FTMSConstants.FMS_STOPPED_OR_PAUSED
 import com.hopkins.fitlink.core.ftms.domain.model.EquipmentType
 import com.polidea.rxandroidble3.RxBleConnection
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -66,13 +68,39 @@ class BleRepositoryFake @Inject constructor() : BleRepository {
         onBytesReceived: (ByteArray) -> Unit,
         onNotificationChanged: (NotificationChanged) -> Unit
     ) {
-        val speedFlow =
-            flowOf(speedPacket(2.5), speedPacket(2.6), speedPacket(2.7), speedPacket(2.8))
-        onNotificationChanged(NotificationChanged.NotificationCreated)
-        scope.launch {
-            speedFlow.collect { bytes ->
-                onBytesReceived(bytes)
-                delay(1_000)
+        if (characteristic == UUID.fromString(FTMSConstants.TREADMILL_CHARACTERISTIC)) {
+            val speedFlow =
+                flowOf(speedPacket(2.5), speedPacket(2.6), speedPacket(2.7), speedPacket(2.8))
+            onNotificationChanged(NotificationChanged.NotificationCreated)
+            scope.launch {
+                speedFlow.collect { bytes ->
+                    onBytesReceived(bytes)
+                    delay(1_000)
+                }
+            }
+        }
+
+        if (characteristic == UUID.fromString(FTMSConstants.FITNESS_MACHINE_STATUS)) {
+            val status04 = byteArrayOf(
+                FMS_RESUMED.toByte()
+            )
+
+            val status0202 = byteArrayOf(
+                FMS_STOPPED_OR_PAUSED.toByte(),
+                FMS_PAUSED.toByte()
+            )
+
+            val status0201 = byteArrayOf(
+                FMS_STOPPED_OR_PAUSED.toByte(),
+                FMS_RESET.toByte()
+            )
+            val statusFlow = flowOf(status04, status0202, status0201)
+            onNotificationChanged(NotificationChanged.NotificationCreated)
+            scope.launch {
+                statusFlow.collect {
+                    onBytesReceived(it)
+                    delay(1_000)
+                }
             }
         }
     }

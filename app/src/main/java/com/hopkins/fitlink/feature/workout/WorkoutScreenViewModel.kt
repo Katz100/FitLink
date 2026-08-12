@@ -12,6 +12,7 @@ import com.hopkins.fitlink.core.ftms.domain.model.MachineUiState.DetectingMachin
 import com.hopkins.fitlink.core.ftms.domain.model.MachineUiState.TreadmillMachine
 import com.hopkins.fitlink.core.ftms.domain.model.Treadmill
 import com.hopkins.fitlink.core.ftms.factory.createMachine
+import com.hopkins.fitlink.core.ftms.util.parseFitnessMachineStatus
 import com.hopkins.fitlink.nav.Screen
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -75,21 +76,7 @@ class WorkoutScreenViewModel @Inject constructor(
                 }
                 if (connectionStatus is ConnectionStatus.Connected) {
                     discoverCharacteristics()
-                    val statusCharacteristic = UUID.fromString(FTMSConstants.FITNESS_MACHINE_STATUS)
-                    bleRepository.subscribeToCharacteristic(
-                        characteristic = statusCharacteristic,
-                        deviceAddress = deviceAddress,
-                        onBytesReceived = { bytes ->
-                            val hex = bytes.joinToString(separator = " ") { byte ->
-                                "%02X".format(byte.toInt() and 0xFF)
-                            }
-
-                            Timber.tag(TAG).i("Status: Received bytes hex: $hex")
-                        },
-                        onNotificationChanged = {
-                            Timber.tag(TAG).i("Status changed: $it")
-                        }
-                    )
+                    subscribeToMachineStatusCharacteristic()
                 }
             }
         )
@@ -132,12 +119,30 @@ class WorkoutScreenViewModel @Inject constructor(
                         }
                     )
                 }
-                subscribeToCharacteristic(deviceAddress, characteristic)
+                subscribeToMachineCharacteristic(deviceAddress, characteristic)
             }
         )
     }
 
-    private fun subscribeToCharacteristic(
+    private fun subscribeToMachineStatusCharacteristic() {
+        val statusCharacteristic = UUID.fromString(FTMSConstants.FITNESS_MACHINE_STATUS)
+        bleRepository.subscribeToCharacteristic(
+            characteristic = statusCharacteristic,
+            deviceAddress = deviceAddress,
+            onBytesReceived = { bytes ->
+                _workoutUiState.update {
+                    it.copy(
+                        fitnessMachineStatus = parseFitnessMachineStatus(bytes)
+                    )
+                }
+                Timber.tag(TAG).i("Received new status: ${_workoutUiState.value.fitnessMachineStatus}")
+            },
+            onNotificationChanged = {
+                Timber.tag(TAG).i("Status changed: $it")
+            }
+        )
+    }
+    private fun subscribeToMachineCharacteristic(
         deviceAddress: String,
         characteristicUUID: UUID
     ) {

@@ -15,18 +15,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.hopkins.fitlink.core.data.ConnectionStatus
 import com.hopkins.fitlink.core.ftms.domain.model.MachineUiState
 import com.hopkins.fitlink.core.ftms.util.formatSeconds
+import com.hopkins.fitlink.feature.workout.FitnessMachineStatus
 import com.hopkins.fitlink.ui.theme.FitLinkTheme
 import java.util.Locale
 
 @Composable
 fun TreadmillView(
     machineState: MachineUiState.TreadmillMachine,
-    connectionStatus: ConnectionStatus,
+    machineStatus: FitnessMachineStatus,
     modifier: Modifier = Modifier
 ) {
     var showAdditionalDetailsForTime by remember { mutableStateOf(false) }
@@ -40,13 +39,7 @@ fun TreadmillView(
     ) {
         Text(
             modifier = Modifier.align(Alignment.TopCenter),
-            text = connectionStatus.toString(),
-            color = when (connectionStatus) {
-                ConnectionStatus.Connected -> Color.Green
-                is ConnectionStatus.ConnectionError -> Color.Red
-                ConnectionStatus.ConnectionLoading -> Color.Black
-                ConnectionStatus.Disconnected -> Color.Yellow
-            }
+            text = machineStatus.toString(),
         )
 
         Row(
@@ -129,7 +122,7 @@ fun TreadMillViewTabletPreview() {
                 watts = "180",
                 maxHeartRate = "170"
             ),
-            connectionStatus = ConnectionStatus.Connected
+            machineStatus = FitnessMachineStatus.Started
         )
     }
 }
@@ -150,7 +143,7 @@ fun TreadMillViewPhoneLandscapeDarkPreview() {
                     watts = "180",
                     maxHeartRate = "170"
                 ),
-                connectionStatus = ConnectionStatus.Connected
+                machineStatus = FitnessMachineStatus.Started
             )
         }
     }
@@ -170,7 +163,7 @@ fun TreadMillViewPhonePortraitPreview() {
                 watts = "180",
                 maxHeartRate = "170"
             ),
-            connectionStatus = ConnectionStatus.Connected
+            machineStatus = FitnessMachineStatus.Started
         )
     }
 }

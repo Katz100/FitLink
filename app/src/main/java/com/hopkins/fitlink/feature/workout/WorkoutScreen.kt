@@ -108,7 +108,7 @@ fun WorkoutScreen(
                     TreadmillView(
                         modifier = Modifier.padding(innerPadding),
                         machineState = machineState,
-                        connectionStatus = uiState.connectionState
+                        machineStatus = uiState.fitnessMachineStatus
                     )
                 }
 
