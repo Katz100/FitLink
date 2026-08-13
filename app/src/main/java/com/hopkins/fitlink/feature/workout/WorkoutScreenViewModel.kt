@@ -13,6 +13,8 @@ import com.hopkins.fitlink.core.ftms.domain.model.MachineUiState.TreadmillMachin
 import com.hopkins.fitlink.core.ftms.domain.model.Treadmill
 import com.hopkins.fitlink.core.ftms.factory.createMachine
 import com.hopkins.fitlink.core.ftms.util.parseFitnessMachineStatus
+import com.hopkins.fitlink.core.room.entity.TreadmillSessionDomain
+import com.hopkins.fitlink.core.room.entity.toEntity
 import com.hopkins.fitlink.nav.Screen
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,7 +37,7 @@ class WorkoutScreenViewModel @Inject constructor(
     }
     private val deviceAddress = savedStateHandle.toRoute<Screen.ActiveWorkout>().macAddress
     private var machine: Machine<*>? = null
-    private var maxHeartRate: Int = 0
+    private val treadmillSession = TreadmillSessionDomain()
 
     private val _workoutUiState = MutableStateFlow<WorkoutUiState>(WorkoutUiState())
     val workoutUiState: StateFlow<WorkoutUiState> = _workoutUiState.asStateFlow()
@@ -165,17 +167,12 @@ class WorkoutScreenViewModel @Inject constructor(
     private fun updateMachineState(bytes: ByteArray) {
         val currentMachine = machine ?: return
         currentMachine.parseDataForMachine(bytes)
+        updateWorkoutSessionInfo()
 
         _workoutUiState.update {
             it.copy(
                 machineUiState = when(currentMachine) {
                     is Treadmill -> {
-                        maxHeartRate = maxHeartRate.coerceAtLeast(
-                            currentMachine.machineData?.heartRate?.toInt()
-                                ?.takeIf {
-                                    it > FTMSConstants.HEART_RATE_MIN && it < FTMSConstants.HEART_RATE_MAX
-                                } ?: 0
-                        )
                         TreadmillMachine(
                             instantaneousSpeed = currentMachine.machineData?.instantaneousSpeed,
                             heartRate = currentMachine.machineData?.heartRate?.takeIf { it > FTMSConstants.HEART_RATE_MIN && it < FTMSConstants.HEART_RATE_MAX } ?: 0,
@@ -185,12 +182,40 @@ class WorkoutScreenViewModel @Inject constructor(
                             calories = currentMachine.machineData?.totalEnergy?.toString() ?: "--",
                             caloriesAnHour = currentMachine.machineData?.energyPerHour?.toString() ?: "--",
                             watts = currentMachine.machineData?.powerOutput?.toString() ?: "--",
-                            maxHeartRate = maxHeartRate.toString()
+                            maxHeartRate = treadmillSession.maxHr.toString()
                         )
                     }
                     else -> return
                 }
             )
+        }
+    }
+
+    private fun updateWorkoutSessionInfo() {
+        val currentMachine = machine ?: return
+        when (currentMachine) {
+            is Treadmill -> {
+                treadmillSession.maxHr = treadmillSession.maxHr.coerceAtLeast(
+                    currentMachine.machineData?.heartRate?.toInt()
+                        ?.takeIf {
+                            it > FTMSConstants.HEART_RATE_MIN && it < FTMSConstants.HEART_RATE_MAX
+                        } ?: 0
+                )
+
+                treadmillSession.maxSpeed = treadmillSession.maxSpeed.coerceAtLeast(
+                    (currentMachine.machineData?.instantaneousSpeed ?: 0.0)
+                )
+
+                treadmillSession.maxWatts = treadmillSession.maxWatts.coerceAtLeast(
+                    (currentMachine.machineData?.powerOutput ?: 0)
+                )
+
+                treadmillSession.maxIncline = treadmillSession.maxIncline.coerceAtLeast(
+                    (currentMachine.machineData?.inclination ?: 0.0)
+                )
+
+
+            }
         }
     }
 }

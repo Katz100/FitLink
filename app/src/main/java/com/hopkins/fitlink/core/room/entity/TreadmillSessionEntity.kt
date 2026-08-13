@@ -24,25 +24,25 @@ data class TreadmillSessionEntity(
 )
 
 data class TreadmillSessionDomain(
-    val id: Long = 0,
+    val id: Long? = null,
 
-    val avgSpeed: Double,
-    val maxSpeed: Double,
-    val avgIncline: Double,
-    val maxIncline: Double,
-    val avgPace: Double,
-    val avgHr: Int,
-    val maxHr: Int,
-    val calories: Int,
-    val avgWatts: Int,
-    val maxWatts: Int,
-    val duration: Int,
+    var avgSpeed: Double = 0.0,
+    var maxSpeed: Double = 0.0,
+    val avgIncline: Double = 0.0,
+    var maxIncline: Double = 0.0,
+    val avgPace: Double = 0.0,
+    val avgHr: Int = 0,
+    var maxHr: Int = 0,
+    val calories: Int = 0,
+    val avgWatts: Int = 0,
+    var maxWatts: Int = 0,
+    val duration: Int = 0,
     val timestamp: Long = System.currentTimeMillis()
 )
 
 fun TreadmillSessionDomain.toEntity(): TreadmillSessionEntity =
     TreadmillSessionEntity(
-        id = id,
+        id = id ?: 0,
         avgSpeed = avgSpeed,
         maxSpeed = maxSpeed,
         avgIncline = avgIncline,
