@@ -38,7 +38,7 @@ class WorkoutScreenViewModel @Inject constructor(
     private val deviceAddress = savedStateHandle.toRoute<Screen.ActiveWorkout>().macAddress
     private var machine: Machine<*>? = null
     private val treadmillSession = TreadmillSessionDomain()
-    val averageHr = mutableListOf<Int>()
+    private val averageHr = mutableListOf<Int>()
 
     private val _workoutUiState = MutableStateFlow<WorkoutUiState>(WorkoutUiState())
     val workoutUiState: StateFlow<WorkoutUiState> = _workoutUiState.asStateFlow()
