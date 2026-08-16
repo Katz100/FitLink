@@ -220,6 +220,8 @@ class WorkoutScreenViewModel @Inject constructor(
                 treadmillSession.avgSpeed = currentMachine.machineData?.averageSpeed ?: 0.0
                 treadmillSession.avgPace = currentMachine.machineData?.averagePace ?: 0.0
                 treadmillSession.avgHr = averageHr.average().toInt()
+                treadmillSession.calories = currentMachine.machineData?.totalEnergy?.toInt() ?: 0
+                treadmillSession.duration = currentMachine.machineData?.elapsedTime ?: 0
             }
         }
     }

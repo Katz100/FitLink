@@ -30,9 +30,9 @@ data class TreadmillSessionDomain(
     var avgPace: Double = 0.0,
     var avgHr: Int = 0,
     var maxHr: Int = 0,
-    val calories: Int = 0,
+    var calories: Int = 0,
     var maxWatts: Int = 0,
-    val duration: Int = 0,
+    var duration: Int = 0,
     val timestamp: Long = System.currentTimeMillis()
 )
 
