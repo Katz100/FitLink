@@ -41,6 +41,7 @@ class WorkoutScreenViewModel @Inject constructor(
 
     private val _workoutUiState = MutableStateFlow<WorkoutUiState>(WorkoutUiState())
     val workoutUiState: StateFlow<WorkoutUiState> = _workoutUiState.asStateFlow()
+    val averageHr = mutableListOf<Int>()
 
     init {
         connectToDevice()
@@ -167,12 +168,14 @@ class WorkoutScreenViewModel @Inject constructor(
     private fun updateMachineState(bytes: ByteArray) {
         val currentMachine = machine ?: return
         currentMachine.parseDataForMachine(bytes)
-        updateWorkoutSessionInfo()
-
         _workoutUiState.update {
             it.copy(
                 machineUiState = when(currentMachine) {
                     is Treadmill -> {
+
+                        currentMachine.machineData?.heartRate?.let {
+                            averageHr.add(it)
+                        }
                         TreadmillMachine(
                             instantaneousSpeed = currentMachine.machineData?.instantaneousSpeed,
                             heartRate = currentMachine.machineData?.heartRate?.takeIf { it > FTMSConstants.HEART_RATE_MIN && it < FTMSConstants.HEART_RATE_MAX } ?: 0,
@@ -189,6 +192,7 @@ class WorkoutScreenViewModel @Inject constructor(
                 }
             )
         }
+        updateWorkoutSessionInfo()
     }
 
     private fun updateWorkoutSessionInfo() {
@@ -214,7 +218,9 @@ class WorkoutScreenViewModel @Inject constructor(
                     (currentMachine.machineData?.inclination ?: 0.0)
                 )
 
-
+                treadmillSession.avgSpeed = currentMachine.machineData?.averageSpeed ?: 0.0
+                treadmillSession.avgPace = currentMachine.machineData?.averagePace ?: 0.0
+                treadmillSession.avgHr = averageHr.average().toInt()
             }
         }
     }
