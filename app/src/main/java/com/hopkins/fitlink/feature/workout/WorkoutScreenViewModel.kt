@@ -14,7 +14,6 @@ import com.hopkins.fitlink.core.ftms.domain.model.Treadmill
 import com.hopkins.fitlink.core.ftms.factory.createMachine
 import com.hopkins.fitlink.core.ftms.util.parseFitnessMachineStatus
 import com.hopkins.fitlink.core.room.entity.TreadmillSessionDomain
-import com.hopkins.fitlink.core.room.entity.toEntity
 import com.hopkins.fitlink.nav.Screen
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -78,14 +77,14 @@ class WorkoutScreenViewModel @Inject constructor(
                     )
                 }
                 if (connectionStatus is ConnectionStatus.Connected) {
-                    discoverCharacteristics()
+                    discoverMachineTypeCharacteristics()
                     subscribeToMachineStatusCharacteristic()
                 }
             }
         )
     }
 
-    private fun discoverCharacteristics() {
+    private fun discoverMachineTypeCharacteristics() {
         bleRepository.discoverCharacteristic(
             deviceAddress = deviceAddress,
             onEquipmentCharacteristicFound = { equipmentType ->
