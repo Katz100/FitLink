@@ -106,25 +106,14 @@ private fun MetricSummaryCard(
         modifier = modifier,
         colors = cardColor
     ) {
-        Column(
-            modifier = Modifier.fillMaxWidth()
-                .padding(12.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            Text(
-                text = heading,
-                style = headingTextStyle
-            )
-            Text(
-                text = value,
-                style = valueTextStyle
-            )
-            Text(
-                text = unit,
-                style = unitTextStyle
-            )
-        }
+        MetricSummary(
+            heading = heading,
+            value = value,
+            unit = unit,
+            valueTextStyle = valueTextStyle,
+            headingTextStyle = headingTextStyle,
+            unitTextStyle = unitTextStyle,
+        )
     }
 }
 
