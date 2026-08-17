@@ -28,6 +28,7 @@ fun TreadmillView(
     machineStatus: FitnessMachineStatus,
     modifier: Modifier = Modifier
 ) {
+    // TODO: hoist details state up
     var showAdditionalDetailsForTime by remember { mutableStateOf(false) }
     var showAdditionalDetailsForCalories by remember { mutableStateOf(false) }
     var showAdditionalDetailsForHeartRate by remember { mutableStateOf(false) }

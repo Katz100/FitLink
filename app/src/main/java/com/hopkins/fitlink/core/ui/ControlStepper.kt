@@ -99,7 +99,7 @@ private fun MetricSummaryCard(
     value: String,
     unit: String,
     valueTextStyle: TextStyle,
-    headingTextStyle: TextStyle = MaterialTheme.typography.headlineMedium,
+    headingTextStyle: TextStyle = MaterialTheme.typography.labelMedium,
     unitTextStyle: TextStyle = MaterialTheme.typography.labelMedium,
 ) {
     Card(
