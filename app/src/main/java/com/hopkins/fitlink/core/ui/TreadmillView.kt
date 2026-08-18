@@ -24,15 +24,16 @@ import java.util.Locale
 
 @Composable
 fun TreadmillView(
+    modifier: Modifier = Modifier,
     machineState: MachineUiState.TreadmillMachine,
     machineStatus: FitnessMachineStatus,
-    modifier: Modifier = Modifier
+    showAdditionalDetailsForTime: Boolean = false,
+    showAdditionalDetailsForCalories: Boolean = false,
+    showAdditionalDetailsForHeartRate: Boolean = false,
+    onShowAdditionalDetailsForTimeClicked: () -> Unit = {},
+    onShowAdditionalDetailsForCaloriesClicked: () -> Unit = {},
+    onShowAdditionalDetailsForHeartRateClicked: () -> Unit = {},
 ) {
-    // TODO: hoist details state up
-    var showAdditionalDetailsForTime by remember { mutableStateOf(false) }
-    var showAdditionalDetailsForCalories by remember { mutableStateOf(false) }
-    var showAdditionalDetailsForHeartRate by remember { mutableStateOf(false) }
-
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -69,7 +70,7 @@ fun TreadmillView(
                     ),
                     modifier = Modifier.weight(1f),
                     showAdditionalItems = showAdditionalDetailsForTime,
-                    onShowAdditionalItemsClick = { showAdditionalDetailsForTime = !showAdditionalDetailsForTime }
+                    onShowAdditionalItemsClick = onShowAdditionalDetailsForTimeClicked
                 )
                 KpiCard(
                     modifier = Modifier.weight(1f),
@@ -78,7 +79,7 @@ fun TreadmillView(
                         hashMapOf("Peak Heart Rate" to machineState.maxHeartRate)
                     ),
                     showAdditionalItems = showAdditionalDetailsForHeartRate,
-                    onShowAdditionalItemsClick = { showAdditionalDetailsForHeartRate = ! showAdditionalDetailsForHeartRate }
+                    onShowAdditionalItemsClick = onShowAdditionalDetailsForHeartRateClicked
                 )
                 KpiCard(
                     modifier = Modifier.weight(1f),
@@ -88,7 +89,7 @@ fun TreadmillView(
                         hashMapOf("Watts" to machineState.watts.toString())
                     ),
                     showAdditionalItems = showAdditionalDetailsForCalories,
-                    onShowAdditionalItemsClick = { showAdditionalDetailsForCalories = !showAdditionalDetailsForCalories}
+                    onShowAdditionalItemsClick = onShowAdditionalDetailsForCaloriesClicked
                 )
             }
 
@@ -144,7 +145,10 @@ fun TreadMillViewPhoneLandscapeDarkPreview() {
                     watts = "180",
                     maxHeartRate = "170"
                 ),
-                machineStatus = FitnessMachineStatus.Started
+                machineStatus = FitnessMachineStatus.Started,
+                showAdditionalDetailsForCalories = true,
+                showAdditionalDetailsForTime = true,
+                showAdditionalDetailsForHeartRate = true,
             )
         }
     }

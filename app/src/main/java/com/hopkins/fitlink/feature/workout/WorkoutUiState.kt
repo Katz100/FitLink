@@ -11,8 +11,11 @@ data class WorkoutUiState(
     val rxConnectionState: RxBleConnection.RxBleConnectionState = RxBleConnection.RxBleConnectionState.DISCONNECTED,
     val notificationStatus: NotificationChanged = NotificationChanged.NotificationLoading,
     val connectionState: ConnectionStatus = ConnectionStatus.ConnectionLoading,
-    val fitnessMachineStatus: FitnessMachineStatus = FitnessMachineStatus.Unknown,
+    val fitnessMachineStatus: FitnessMachineStatus = FitnessMachineStatus.Started,
     val machineUiState: MachineUiState = MachineUiState.DetectingMachine,
+    val showAdditionalDetailsForTime: Boolean = false,
+    val showAdditionalDetailsForCalories: Boolean = false,
+    val showAdditionalDetailsForHearRate: Boolean = false,
 )
 
 interface FitnessMachineStatus {

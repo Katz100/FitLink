@@ -108,7 +108,13 @@ fun WorkoutScreen(
                     TreadmillView(
                         modifier = Modifier.padding(innerPadding),
                         machineState = machineState,
-                        machineStatus = uiState.fitnessMachineStatus
+                        machineStatus = uiState.fitnessMachineStatus,
+                        showAdditionalDetailsForTime = uiState.showAdditionalDetailsForTime,
+                        showAdditionalDetailsForCalories = uiState.showAdditionalDetailsForCalories,
+                        showAdditionalDetailsForHeartRate = uiState.showAdditionalDetailsForHearRate,
+                        onShowAdditionalDetailsForCaloriesClicked = viewModel::flipCaloriesDetails,
+                        onShowAdditionalDetailsForHeartRateClicked = viewModel::flipHeartRateDetails,
+                        onShowAdditionalDetailsForTimeClicked = viewModel::flipTimeDetails,
                     )
                 }
 

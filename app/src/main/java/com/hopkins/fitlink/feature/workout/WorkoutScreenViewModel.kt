@@ -225,5 +225,29 @@ class WorkoutScreenViewModel @Inject constructor(
             }
         }
     }
+
+    fun flipTimeDetails() {
+        _workoutUiState.update {
+            it.copy(
+                showAdditionalDetailsForTime = !_workoutUiState.value.showAdditionalDetailsForTime
+            )
+        }
+    }
+
+    fun flipCaloriesDetails() {
+        _workoutUiState.update {
+            it.copy(
+                showAdditionalDetailsForCalories = !_workoutUiState.value.showAdditionalDetailsForCalories
+            )
+        }
+    }
+
+    fun flipHeartRateDetails() {
+        _workoutUiState.update {
+            it.copy(
+                showAdditionalDetailsForHearRate = !_workoutUiState.value.showAdditionalDetailsForHearRate
+            )
+        }
+    }
 }
 
