@@ -17,6 +17,14 @@ annotation class TabletPreview
 annotation class LandscapePhonePreview
 
 @Preview(
+    name = "LandscapePhoneDarkIncreasedFont",
+    showBackground = true,
+    fontScale = 1.5f,
+    device = "spec:width=411dp,height=891dp,dpi=420,isRound=false,chinSize=0dp,orientation=landscape,cutout=none,navigation=gesture"
+)
+annotation class LandscapePhoneIncreasedFontPreview
+
+@Preview(
     name = "PhonePortrait",
     showBackground = true,
     device = "spec:width=411dp,height=891dp,dpi=420,isRound=false,chinSize=0dp,orientation=portrait,cutout=none,navigation=gesture"

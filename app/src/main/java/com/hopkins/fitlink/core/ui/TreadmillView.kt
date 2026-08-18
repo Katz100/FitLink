@@ -154,6 +154,31 @@ fun TreadMillViewPhoneLandscapeDarkPreview() {
     }
 }
 
+@LandscapePhoneIncreasedFontPreview
+@Composable
+fun TreadMillViewPhoneLandscapeDarkIncreasedFontPreview() {
+    FitLinkTheme(darkTheme = true) {
+        Scaffold { innerPadding ->
+            TreadmillView(
+                modifier = Modifier.padding(innerPadding),
+                machineState = MachineUiState.TreadmillMachine(
+                    instantaneousSpeed = 500.0,
+                    heartRate = 100,
+                    inclination = 12.0,
+                    calories = "250",
+                    caloriesAnHour = "600",
+                    watts = "180",
+                    maxHeartRate = "170"
+                ),
+                machineStatus = FitnessMachineStatus.Started,
+                showAdditionalDetailsForCalories = true,
+                showAdditionalDetailsForTime = true,
+                showAdditionalDetailsForHeartRate = true,
+            )
+        }
+    }
+}
+
 @PortraitPhonePreview
 @Composable
 fun TreadMillViewPhonePortraitPreview() {
