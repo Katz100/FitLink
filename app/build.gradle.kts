@@ -101,6 +101,7 @@ dependencies {
     testImplementation (libs.robolectric)
     testImplementation (libs.mockclient)
     testImplementation (libs.mockito.core)
+    testImplementation(libs.androidx.sqlite.bundled)
 
     // room
     val room_version = "3.0.1"

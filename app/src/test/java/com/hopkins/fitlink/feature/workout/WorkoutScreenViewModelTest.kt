@@ -1,12 +1,20 @@
 package com.hopkins.fitlink.feature.workout
 
+import android.content.Context
 import android.os.ParcelUuid
 import androidx.lifecycle.SavedStateHandle
+import androidx.room3.Room
+import androidx.sqlite.driver.bundled.BundledSQLiteDriver
+import androidx.test.core.app.ApplicationProvider
 import com.hopkins.fitlink.core.data.BleRepository
 import com.hopkins.fitlink.core.data.ConnectionStatus
+import com.hopkins.fitlink.core.data.WorkoutRepository
 import com.hopkins.fitlink.core.data.impl.BleRepositoryImpl
+import com.hopkins.fitlink.core.data.impl.WorkoutRepositoryImpl
 import com.hopkins.fitlink.core.ftms.FTMSConstants
 import com.hopkins.fitlink.core.ftms.domain.model.EquipmentType
+import com.hopkins.fitlink.core.room.AppDatabase
+import com.hopkins.fitlink.core.room.dao.TreadmillDao
 import com.polidea.rxandroidble3.RxBleClient
 import com.polidea.rxandroidble3.mockrxandroidble.RxBleClientMock
 import com.polidea.rxandroidble3.mockrxandroidble.RxBleConnectionMock
@@ -36,6 +44,9 @@ private val treadmillData = byteArrayOf(
 class WorkoutScreenViewModelTest {
     private lateinit var mockClient: RxBleClient
     private lateinit var bleRepository: BleRepository
+    private lateinit var workoutRepository: WorkoutRepository
+    private lateinit var treadmillDao: TreadmillDao
+    private lateinit var db: AppDatabase
     private lateinit var viewModel: WorkoutScreenViewModel
 
     @Before
@@ -71,13 +82,23 @@ class WorkoutScreenViewModelTest {
             .build()
 
         mockClient = spy(rxMockClient)
+
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        db = Room.inMemoryDatabaseBuilder<AppDatabase>(context)
+            .setDriver(BundledSQLiteDriver())
+            .build()
+        treadmillDao = db.treadmillDao()
+
         bleRepository = BleRepositoryImpl(
             rxBleClient = mockClient
+        )
+        workoutRepository = WorkoutRepositoryImpl(
+            treadmillDao = treadmillDao
         )
         val savedStateHandle = SavedStateHandle(
             mapOf("macAddress" to macAddress)
         )
-        viewModel = WorkoutScreenViewModel(bleRepository, savedStateHandle)
+        viewModel = WorkoutScreenViewModel(bleRepository,  workoutRepository, savedStateHandle)
     }
 
     @Test
