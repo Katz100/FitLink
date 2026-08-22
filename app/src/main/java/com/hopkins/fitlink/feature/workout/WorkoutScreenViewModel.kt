@@ -2,9 +2,11 @@ package com.hopkins.fitlink.feature.workout
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.hopkins.fitlink.core.data.BleRepository
 import com.hopkins.fitlink.core.data.ConnectionStatus
+import com.hopkins.fitlink.core.data.WorkoutRepository
 import com.hopkins.fitlink.core.ftms.FTMSConstants
 import com.hopkins.fitlink.core.ftms.domain.model.EquipmentType
 import com.hopkins.fitlink.core.ftms.domain.model.Machine
@@ -16,10 +18,12 @@ import com.hopkins.fitlink.core.ftms.util.parseFitnessMachineStatus
 import com.hopkins.fitlink.core.room.entity.TreadmillSessionDomain
 import com.hopkins.fitlink.nav.Screen
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.UUID
 import javax.inject.Inject
@@ -27,7 +31,7 @@ import javax.inject.Inject
 @HiltViewModel
 class WorkoutScreenViewModel @Inject constructor(
     private val bleRepository: BleRepository,
-
+    private val workoutRepository: WorkoutRepository,
     savedStateHandle: SavedStateHandle,
 ): ViewModel() {
 
@@ -58,6 +62,19 @@ class WorkoutScreenViewModel @Inject constructor(
 
     fun disconnectFromDevice() {
         bleRepository.disconnectFromDevice()
+        saveSession()
+    }
+
+    private fun saveSession() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val currentMachine = machine ?: return@launch
+            when (currentMachine) {
+                is Treadmill -> {
+                    Timber.tag(TAG).i("Saving treadmill session: $treadmillSession")
+                    workoutRepository.insertTreadmillSession(treadmillSession)
+                }
+            }
+        }
     }
 
     fun connectToDevice() {

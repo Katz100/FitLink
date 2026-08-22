@@ -1,6 +1,5 @@
 package com.hopkins.fitlink.feature.workout
 
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,7 +19,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -37,7 +35,6 @@ fun WorkoutScreen(
 ) {
     val uiState = viewModel.workoutUiState.collectAsStateWithLifecycle().value
     var showDisconnectedDialog by remember { mutableStateOf(false) }
-    val context = LocalContext.current
 
     LaunchedEffect(uiState.connectionState) {
         when (uiState.connectionState) {
@@ -48,12 +45,11 @@ fun WorkoutScreen(
         }
     }
 
-    LaunchedEffect(uiState.notificationStatus) {
-        Toast.makeText(context, uiState.notificationStatus.toString(), Toast.LENGTH_SHORT).show()
-    }
-
-    LaunchedEffect(uiState.rxConnectionState) {
-        Toast.makeText(context, uiState.rxConnectionState.toString(), Toast.LENGTH_SHORT).show()
+    LaunchedEffect(uiState.fitnessMachineStatus) {
+        if (uiState.fitnessMachineStatus == FitnessMachineStatus.Stopped) {
+            viewModel.disconnectFromDevice()
+            onWorkoutEnded()
+        }
     }
 
     BackHandler {
