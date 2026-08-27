@@ -1,11 +1,11 @@
-package com.hopkins.fitlink.core.room.dao
+package com.hopkins.fitlink.core.data.room.dao
 
 import androidx.room3.Dao
 import androidx.room3.Insert
 import androidx.room3.OnConflictStrategy
 import androidx.room3.Query
-import com.hopkins.fitlink.core.room.RoomConstants
-import com.hopkins.fitlink.core.room.entity.TreadmillSessionEntity
+import com.hopkins.fitlink.core.data.room.RoomConstants
+import com.hopkins.fitlink.core.data.room.entity.TreadmillSessionEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

@@ -1,10 +1,10 @@
-package com.hopkins.fitlink.core.data.impl
+package com.hopkins.fitlink.core.data.repository.impl
 
-import com.hopkins.fitlink.core.data.WorkoutRepository
-import com.hopkins.fitlink.core.room.dao.TreadmillDao
-import com.hopkins.fitlink.core.room.entity.TreadmillSessionDomain
-import com.hopkins.fitlink.core.room.entity.toDomain
-import com.hopkins.fitlink.core.room.entity.toEntity
+import com.hopkins.fitlink.core.data.repository.WorkoutRepository
+import com.hopkins.fitlink.core.data.room.dao.TreadmillDao
+import com.hopkins.fitlink.core.data.room.entity.TreadmillSessionDomain
+import com.hopkins.fitlink.core.data.room.entity.toDomain
+import com.hopkins.fitlink.core.data.room.entity.toEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject

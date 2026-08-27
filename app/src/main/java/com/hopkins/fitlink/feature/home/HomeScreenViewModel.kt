@@ -1,8 +1,8 @@
 package com.hopkins.fitlink.feature.home
 
 import androidx.lifecycle.ViewModel
-import com.hopkins.fitlink.core.ftms.domain.model.BleDeviceModel
-import com.hopkins.fitlink.core.data.BleRepository
+import com.hopkins.fitlink.core.domain.model.BleDeviceModel
+import com.hopkins.fitlink.core.data.repository.BleRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

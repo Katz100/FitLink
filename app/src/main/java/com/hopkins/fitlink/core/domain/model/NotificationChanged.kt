@@ -1,4 +1,4 @@
-package com.hopkins.fitlink.core.data
+package com.hopkins.fitlink.core.domain.model
 
 sealed interface NotificationChanged {
     data object NotificationLoading: NotificationChanged

@@ -23,8 +23,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.hopkins.fitlink.core.data.ConnectionStatus
-import com.hopkins.fitlink.core.ftms.domain.model.MachineUiState
+import com.hopkins.fitlink.core.domain.model.ConnectionStatus
+import com.hopkins.fitlink.feature.workout.MachineUiState
 import com.hopkins.fitlink.core.ui.DisconnectedDialog
 import com.hopkins.fitlink.core.ui.TreadmillView
 

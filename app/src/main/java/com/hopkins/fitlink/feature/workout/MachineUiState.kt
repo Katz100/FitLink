@@ -1,4 +1,4 @@
-package com.hopkins.fitlink.core.ftms.domain.model
+package com.hopkins.fitlink.feature.workout
 
 sealed interface MachineUiState {
     data object DetectingMachine: MachineUiState

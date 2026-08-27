@@ -1,4 +1,4 @@
-package com.hopkins.fitlink.core.ftms.domain.model
+package com.hopkins.fitlink.core.domain.model
 
 import com.hopkins.fitlink.core.ftms.FTMSConstants
 import com.hopkins.fitlink.core.ftms.util.getUInt24

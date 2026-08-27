@@ -1,8 +1,8 @@
 package com.hopkins.fitlink
 
 import android.os.ParcelUuid
-import com.hopkins.fitlink.core.data.BleRepository
-import com.hopkins.fitlink.core.data.impl.BleRepositoryImpl
+import com.hopkins.fitlink.core.data.repository.BleRepository
+import com.hopkins.fitlink.core.data.repository.impl.BleRepositoryImpl
 import com.hopkins.fitlink.core.ftms.FTMSConstants
 import com.hopkins.fitlink.feature.home.HomeScreenViewModel
 import com.polidea.rxandroidble3.RxBleClient

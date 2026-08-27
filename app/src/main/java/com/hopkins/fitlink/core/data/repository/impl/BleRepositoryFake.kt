@@ -1,15 +1,15 @@
-package com.hopkins.fitlink.core.data.impl
+package com.hopkins.fitlink.core.data.repository.impl
 
-import com.hopkins.fitlink.core.ftms.domain.model.BleDeviceModel
-import com.hopkins.fitlink.core.data.BleRepository
-import com.hopkins.fitlink.core.data.ConnectionStatus
-import com.hopkins.fitlink.core.data.NotificationChanged
+import com.hopkins.fitlink.core.domain.model.BleDeviceModel
+import com.hopkins.fitlink.core.data.repository.BleRepository
+import com.hopkins.fitlink.core.domain.model.ConnectionStatus
+import com.hopkins.fitlink.core.domain.model.NotificationChanged
 import com.hopkins.fitlink.core.ftms.FTMSConstants
 import com.hopkins.fitlink.core.ftms.FTMSConstants.FMS_PAUSED
 import com.hopkins.fitlink.core.ftms.FTMSConstants.FMS_RESET
 import com.hopkins.fitlink.core.ftms.FTMSConstants.FMS_RESUMED
 import com.hopkins.fitlink.core.ftms.FTMSConstants.FMS_STOPPED_OR_PAUSED
-import com.hopkins.fitlink.core.ftms.domain.model.EquipmentType
+import com.hopkins.fitlink.core.domain.model.EquipmentType
 import com.polidea.rxandroidble3.RxBleConnection
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

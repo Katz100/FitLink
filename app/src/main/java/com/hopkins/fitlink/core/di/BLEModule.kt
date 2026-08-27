@@ -5,10 +5,10 @@ import android.bluetooth.BluetoothManager
 import android.content.Context
 import com.hopkins.fitlink.core.ble.FitBluetoothLeScanner
 import com.hopkins.fitlink.core.ble.FitBluetoothScannerImpl
-import com.hopkins.fitlink.core.data.BleRepository
-import com.hopkins.fitlink.core.data.WorkoutRepository
-import com.hopkins.fitlink.core.data.impl.BleRepositoryImpl
-import com.hopkins.fitlink.core.data.impl.WorkoutRepositoryImpl
+import com.hopkins.fitlink.core.data.repository.BleRepository
+import com.hopkins.fitlink.core.data.repository.WorkoutRepository
+import com.hopkins.fitlink.core.data.repository.impl.BleRepositoryImpl
+import com.hopkins.fitlink.core.data.repository.impl.WorkoutRepositoryImpl
 import com.polidea.rxandroidble3.RxBleClient
 import dagger.Binds
 import dagger.Module

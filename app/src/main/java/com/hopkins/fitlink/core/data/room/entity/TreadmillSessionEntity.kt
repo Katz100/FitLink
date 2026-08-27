@@ -1,8 +1,8 @@
-package com.hopkins.fitlink.core.room.entity
+package com.hopkins.fitlink.core.data.room.entity
 
 import androidx.room3.Entity
 import androidx.room3.PrimaryKey
-import com.hopkins.fitlink.core.room.RoomConstants
+import com.hopkins.fitlink.core.data.room.RoomConstants
 
 @Entity(tableName = RoomConstants.TREADMILL_TABLE)
 data class TreadmillSessionEntity(

@@ -1,6 +1,6 @@
-package com.hopkins.fitlink.core.data
+package com.hopkins.fitlink.core.data.repository
 
-import com.hopkins.fitlink.core.room.entity.TreadmillSessionDomain
+import com.hopkins.fitlink.core.data.room.entity.TreadmillSessionDomain
 import kotlinx.coroutines.flow.Flow
 
 interface WorkoutRepository {

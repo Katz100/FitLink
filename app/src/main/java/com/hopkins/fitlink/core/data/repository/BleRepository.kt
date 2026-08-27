@@ -1,7 +1,9 @@
-package com.hopkins.fitlink.core.data
+package com.hopkins.fitlink.core.data.repository
 
-import com.hopkins.fitlink.core.ftms.domain.model.BleDeviceModel
-import com.hopkins.fitlink.core.ftms.domain.model.EquipmentType
+import com.hopkins.fitlink.core.domain.model.BleDeviceModel
+import com.hopkins.fitlink.core.domain.model.ConnectionStatus
+import com.hopkins.fitlink.core.domain.model.EquipmentType
+import com.hopkins.fitlink.core.domain.model.NotificationChanged
 import com.polidea.rxandroidble3.RxBleConnection
 import java.util.UUID
 

@@ -1,4 +1,4 @@
-package com.hopkins.fitlink.core.ftms.domain.model
+package com.hopkins.fitlink.core.domain.model
 
 data class TreadmillData(
     val moreData: Boolean,

@@ -3,8 +3,8 @@ package com.hopkins.fitlink.core.di
 import android.content.Context
 import androidx.room3.Room
 import androidx.sqlite.driver.AndroidSQLiteDriver
-import com.hopkins.fitlink.core.room.AppDatabase
-import com.hopkins.fitlink.core.room.dao.TreadmillDao
+import com.hopkins.fitlink.core.data.room.AppDatabase
+import com.hopkins.fitlink.core.data.room.dao.TreadmillDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

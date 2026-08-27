@@ -1,6 +1,6 @@
 package com.hopkins.fitlink.feature.home
 
-import com.hopkins.fitlink.core.ftms.domain.model.BleDeviceModel
+import com.hopkins.fitlink.core.domain.model.BleDeviceModel
 
 data class HomeScreenUiState(
     val devices: List<BleDeviceModel> = emptyList(),
