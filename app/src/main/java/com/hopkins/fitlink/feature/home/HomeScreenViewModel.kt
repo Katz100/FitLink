@@ -1,5 +1,9 @@
 package com.hopkins.fitlink.feature.home
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import com.hopkins.fitlink.core.domain.model.BleDeviceModel
 import com.hopkins.fitlink.core.data.repository.BleRepository
@@ -14,6 +18,13 @@ import javax.inject.Inject
 class HomeScreenViewModel @Inject constructor(
     private val bleRepository: BleRepository,
 ) : ViewModel() {
+
+    val blePermissions = arrayOf(
+        Manifest.permission.BLUETOOTH_CONNECT,
+        Manifest.permission.BLUETOOTH_SCAN,
+        Manifest.permission.ACCESS_COARSE_LOCATION,
+        Manifest.permission.ACCESS_FINE_LOCATION,
+    )
 
     private val _devices = MutableStateFlow<List<BleDeviceModel>>(emptyList())
     val devices: StateFlow<List<BleDeviceModel>> = _devices.asStateFlow()
@@ -70,6 +81,14 @@ class HomeScreenViewModel @Inject constructor(
 
     fun stopScanning() {
         bleRepository.stopScanning()
+    }
+
+    fun isBlePermissionsGranted(
+        context: Context
+    ): Boolean {
+        return blePermissions.all { permission ->
+            ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+        }
     }
 }
 

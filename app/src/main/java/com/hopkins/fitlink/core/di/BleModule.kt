@@ -1,12 +1,9 @@
 package com.hopkins.fitlink.core.di
 
-import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothManager
 import android.content.Context
-import com.hopkins.fitlink.core.ble.FitBluetoothLeScanner
-import com.hopkins.fitlink.core.ble.FitBluetoothScannerImpl
 import com.hopkins.fitlink.core.data.repository.BleRepository
 import com.hopkins.fitlink.core.data.repository.WorkoutRepository
+import com.hopkins.fitlink.core.data.repository.impl.BleRepositoryFake
 import com.hopkins.fitlink.core.data.repository.impl.BleRepositoryImpl
 import com.hopkins.fitlink.core.data.repository.impl.WorkoutRepositoryImpl
 import com.polidea.rxandroidble3.RxBleClient
@@ -29,15 +26,6 @@ class BLEModule {
     ): RxBleClient {
         return RxBleClient.create(context)
     }
-
-    @Singleton
-    @Provides
-    fun provideBluetoothAdapter(
-        @ApplicationContext context: Context
-    ): BluetoothAdapter? {
-        val bluetoothManager: BluetoothManager = context.getSystemService(BluetoothManager::class.java)
-        return bluetoothManager.adapter
-    }
 }
 
 @Module
@@ -53,10 +41,4 @@ abstract class BluetoothScannerBindModule {
     abstract fun bindWorkoutRepository(
         impl: WorkoutRepositoryImpl
     ): WorkoutRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindFitBluetoothLeScanner(
-        impl: FitBluetoothScannerImpl
-    ): FitBluetoothLeScanner
 }
