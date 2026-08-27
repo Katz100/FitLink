@@ -1,5 +1,6 @@
 package com.hopkins.fitlink.nav
 
+import com.hopkins.fitlink.core.domain.model.EquipmentType
 import kotlinx.serialization.Serializable
 
 sealed interface Screen {
@@ -19,6 +20,9 @@ sealed interface Screen {
 
     @Serializable
     object Settings: Screen
+
+    @Serializable
+    data class WorkoutSummary(val equipmentType: EquipmentType): Screen
 
     @Serializable
     data class ActiveWorkout(val macAddress: String): Screen

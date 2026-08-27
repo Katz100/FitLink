@@ -19,4 +19,13 @@ interface TreadmillDao {
         """
     )
     fun getAllTreadmillSessions(): Flow<List<TreadmillSessionEntity>>
+
+    @Query(
+        """
+            SELECT * FROM ${RoomConstants.TREADMILL_TABLE}
+            ORDER BY timestamp desc
+            LIMIT 1
+        """
+    )
+    suspend fun getMostRecentTreadmillSession(): TreadmillSessionEntity
 }

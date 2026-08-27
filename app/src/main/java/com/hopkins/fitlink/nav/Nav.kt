@@ -58,6 +58,7 @@ fun Nav() {
                                     Screen.History -> Text("History")
                                     Screen.Home -> Text("Connect")
                                     Screen.Settings -> Text("Settings")
+                                    Screen.WorkoutSummary -> Text("Workout Summary")
                                 }
                             }
                         )
