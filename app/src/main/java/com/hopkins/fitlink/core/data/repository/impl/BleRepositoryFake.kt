@@ -90,11 +90,7 @@ class BleRepositoryFake @Inject constructor() : BleRepository {
                 FMS_PAUSED.toByte()
             )
 
-            val status0201 = byteArrayOf(
-                FMS_STOPPED_OR_PAUSED.toByte(),
-                FMS_RESET.toByte()
-            )
-            val statusFlow = flowOf(status04, status0202, status0201)
+            val statusFlow = flowOf(status04, status0202)
             onNotificationChanged(NotificationChanged.NotificationCreated)
             scope.launch {
                 statusFlow.collect {

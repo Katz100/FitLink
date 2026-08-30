@@ -16,6 +16,7 @@ data class WorkoutUiState(
     val showAdditionalDetailsForTime: Boolean = false,
     val showAdditionalDetailsForCalories: Boolean = false,
     val showAdditionalDetailsForHearRate: Boolean = false,
+    val navigateToSummaryScreen: Boolean = false,
 )
 
 interface FitnessMachineStatus {

@@ -20,11 +20,15 @@ class WorkoutRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun insertTreadmillSession(treadmillSession: TreadmillSessionDomain) {
-        treadmillDao.insertTreadmillSession(treadmillSession.toEntity())
+    override suspend fun insertTreadmillSession(treadmillSession: TreadmillSessionDomain): Long {
+        return treadmillDao.insertTreadmillSession(treadmillSession.toEntity())
     }
 
     override suspend fun getMostRecentTreadmillSession(): TreadmillSessionDomain {
         return treadmillDao.getMostRecentTreadmillSession().toDomain()
+    }
+
+    override suspend fun getTreadmillSessionById(id: Long): TreadmillSessionDomain? {
+        return treadmillDao.getTreadmillSessionById(id)?.toDomain()
     }
 }

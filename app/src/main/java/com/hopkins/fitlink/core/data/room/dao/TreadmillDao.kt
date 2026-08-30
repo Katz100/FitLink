@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface TreadmillDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertTreadmillSession(treadmillSessionEntity: TreadmillSessionEntity)
+    suspend fun insertTreadmillSession(treadmillSessionEntity: TreadmillSessionEntity): Long
 
     @Query(
         """
@@ -28,4 +28,12 @@ interface TreadmillDao {
         """
     )
     suspend fun getMostRecentTreadmillSession(): TreadmillSessionEntity
+
+    @Query(
+        """
+            SELECT * FROM ${RoomConstants.TREADMILL_TABLE}
+            WHERE id = :id
+        """
+    )
+    suspend fun getTreadmillSessionById(id: Long): TreadmillSessionEntity?
 }

@@ -41,6 +41,7 @@ class WorkoutScreenViewModel @Inject constructor(
     private val deviceAddress = savedStateHandle.toRoute<Screen.ActiveWorkout>().macAddress
     private var machine: Machine<*>? = null
     private val treadmillSession = TreadmillSessionDomain()
+    var sessionId: Long? = null
     private val averageHr = mutableListOf<Int>()
 
     private val _workoutUiState = MutableStateFlow<WorkoutUiState>(WorkoutUiState())
@@ -71,8 +72,13 @@ class WorkoutScreenViewModel @Inject constructor(
             when (currentMachine) {
                 is Treadmill -> {
                     Timber.tag(TAG).i("Saving treadmill session: $treadmillSession")
-                    workoutRepository.insertTreadmillSession(treadmillSession)
+                    sessionId = workoutRepository.insertTreadmillSession(treadmillSession)
                 }
+            }
+            _workoutUiState.update {
+                it.copy(
+                    navigateToSummaryScreen = true
+                )
             }
         }
     }
