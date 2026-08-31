@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.hopkins.fitlink.core.domain.model.ConnectionStatus
+import com.hopkins.fitlink.core.domain.model.EquipmentType
 import com.hopkins.fitlink.core.ui.DisconnectedDialog
 import com.hopkins.fitlink.core.ui.TreadmillView
 import timber.log.Timber
@@ -31,7 +32,7 @@ import timber.log.Timber
 @Composable
 fun WorkoutScreen(
     viewModel: WorkoutScreenViewModel = hiltViewModel(),
-    onWorkoutEnded: (Long) -> Unit,
+    onWorkoutEnded: (Long, EquipmentType) -> Unit,
 ) {
     val uiState = viewModel.workoutUiState.collectAsStateWithLifecycle().value
     var showDisconnectedDialog by remember { mutableStateOf(false) }
@@ -55,7 +56,7 @@ fun WorkoutScreen(
         if (uiState.navigateToSummaryScreen) {
             viewModel.sessionId?.let {
                 Timber.tag("WorkoutScreen").i("Id: $it")
-                onWorkoutEnded(it)
+                onWorkoutEnded(it, viewModel.workoutUiState.value.equipmentType)
             }
         }
     }

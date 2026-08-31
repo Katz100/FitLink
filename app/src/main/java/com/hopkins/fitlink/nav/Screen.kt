@@ -22,7 +22,7 @@ sealed interface Screen {
     object Settings: Screen
 
     @Serializable
-    data class WorkoutSummary(val equipmentType: EquipmentType): Screen
+    data class WorkoutSummary(val id: Long, val equipmentType: EquipmentType): Screen
 
     @Serializable
     data class ActiveWorkout(val macAddress: String): Screen

@@ -15,10 +15,12 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.navigation.NavOptions
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navOptions
 import com.hopkins.fitlink.feature.workout.WorkoutScreen
 import com.hopkins.fitlink.feature.home.HomeScreen
 
@@ -33,11 +35,12 @@ fun Nav() {
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
-    val isBottomDestination = currentDestination?.hasRoute<Screen.ActiveWorkout>() != true
+    val shouldHideBottomBar = currentDestination?.hasRoute<Screen.ActiveWorkout>() == true ||
+            currentDestination?.hasRoute<Screen.WorkoutSummary>() == true
 
     Scaffold(
         bottomBar = {
-            if (isBottomDestination) {
+            if (!shouldHideBottomBar) {
                 NavigationBar(windowInsets = NavigationBarDefaults.windowInsets) {
                     Screen.BottomDestinations.forEachIndexed { index, destination ->
                         NavigationBarItem(
@@ -81,8 +84,15 @@ fun Nav() {
 
             composable<Screen.ActiveWorkout> {
                 WorkoutScreen(
-                    onWorkoutEnded = {
-                        navController.popBackStack()
+                    onWorkoutEnded = { id, equipmentType ->
+                        navController.navigate(
+                            route = Screen.WorkoutSummary(id, equipmentType),
+                            navOptions = navOptions {
+                                popUpTo<Screen.ActiveWorkout>() {
+                                    inclusive = true
+                                }
+                            }
+                        )
                     }
                 )
             }
@@ -93,6 +103,10 @@ fun Nav() {
 
             composable<Screen.Settings> {
                 Text("Settings")
+            }
+
+            composable<Screen.WorkoutSummary> {
+                Text("Summary")
             }
         }
     }
