@@ -23,6 +23,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
 import com.hopkins.fitlink.feature.workout.WorkoutScreen
 import com.hopkins.fitlink.feature.home.HomeScreen
+import com.hopkins.fitlink.feature.summary.SummaryScreen
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -106,7 +107,7 @@ fun Nav() {
             }
 
             composable<Screen.WorkoutSummary> {
-                Text("Summary")
+                SummaryScreen()
             }
         }
     }
