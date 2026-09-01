@@ -3,7 +3,6 @@ package com.hopkins.fitlink.core.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -107,6 +106,7 @@ private fun MetricSummaryCard(
         colors = cardColor
     ) {
         MetricSummary(
+            modifier = Modifier.fillMaxWidth(),
             heading = heading,
             value = value,
             unit = unit,

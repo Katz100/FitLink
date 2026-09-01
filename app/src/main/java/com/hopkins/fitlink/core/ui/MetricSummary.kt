@@ -31,8 +31,7 @@ fun MetricSummary(
     icon: ImageVector? = null,
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth()
-            .padding(12.dp),
+        modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {

@@ -1,6 +1,5 @@
 package com.hopkins.fitlink.feature.summary
 
-import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -33,11 +32,6 @@ class SummaryScreenViewModel @Inject constructor(
     val uiState: StateFlow<SummaryUiState> = _uiState.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            _uiState.collect {
-                Timber.tag(TAG).i("$it")
-            }
-        }
         when (equipmentType) {
             EquipmentType.TREADMILL -> {
                 viewModelScope.launch(Dispatchers.IO) {

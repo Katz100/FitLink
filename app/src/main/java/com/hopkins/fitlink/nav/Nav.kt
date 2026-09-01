@@ -107,7 +107,11 @@ fun Nav() {
             }
 
             composable<Screen.WorkoutSummary> {
-                SummaryScreen()
+                SummaryScreen(
+                    onHomeButtonClicked = {
+                        navController.popBackStack()
+                    }
+                )
             }
         }
     }
