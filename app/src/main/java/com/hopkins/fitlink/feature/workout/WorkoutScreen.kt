@@ -42,7 +42,7 @@ fun WorkoutScreen(
             ConnectionStatus.Connected -> showDisconnectedDialog = false
             is ConnectionStatus.ConnectionError -> Unit
             ConnectionStatus.ConnectionLoading -> Unit
-            ConnectionStatus.Disconnected -> showDisconnectedDialog = true
+            ConnectionStatus.Disconnected -> showDisconnectedDialog = uiState.fitnessMachineStatus != FitnessMachineStatus.Stopped
         }
     }
 
