@@ -89,7 +89,7 @@ fun SummaryScreen(
                                             modifier = Modifier.weight(1f),
                                             valueTextStyle = MaterialTheme.typography.headlineMedium,
                                             heading = "Avg Speed",
-                                            value = treadmillSession.avgSpeed.toString(),
+                                            value = treadmillSession.avgSpeed.toString().format(2),
                                             unit = "mph",
                                             icon = Icons.Default.Build
                                         )

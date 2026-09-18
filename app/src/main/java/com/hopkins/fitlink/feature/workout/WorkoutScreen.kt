@@ -33,6 +33,7 @@ import timber.log.Timber
 fun WorkoutScreen(
     viewModel: WorkoutScreenViewModel = hiltViewModel(),
     onWorkoutEnded: (Long, EquipmentType) -> Unit,
+    onGoBackToHome: () -> Unit,
 ) {
     val uiState = viewModel.workoutUiState.collectAsStateWithLifecycle().value
     var showDisconnectedDialog by remember { mutableStateOf(false) }
@@ -54,15 +55,33 @@ fun WorkoutScreen(
 
     LaunchedEffect(uiState.navigateToSummaryScreen) {
         if (uiState.navigateToSummaryScreen) {
+            Timber.tag("WorkoutScreen").i("Navigate to summary screen is true")
+            Timber.tag("WorkoutScreen").i("SessionId: ${viewModel.sessionId}")
             viewModel.sessionId?.let {
                 Timber.tag("WorkoutScreen").i("Id: $it")
                 onWorkoutEnded(it, viewModel.workoutUiState.value.equipmentType)
+            } ?: run {
+                Timber.tag("WorkoutScreen").i("Workout session is null")
+                onGoBackToHome()
             }
         }
     }
 
     BackHandler {
-        viewModel.disconnectFromDevice()
+        when (uiState.connectionState) {
+            ConnectionStatus.Connected -> {
+                viewModel.disconnectFromDevice()
+            }
+            ConnectionStatus.ConnectionLoading -> {
+                onGoBackToHome()
+            }
+            is ConnectionStatus.ConnectionError -> {
+                onGoBackToHome()
+            }
+            ConnectionStatus.Disconnected -> {
+                onGoBackToHome()
+            }
+        }
     }
 
     if (showDisconnectedDialog) {

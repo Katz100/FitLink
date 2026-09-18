@@ -48,8 +48,10 @@ class WorkoutScreenViewModel @Inject constructor(
     val workoutUiState: StateFlow<WorkoutUiState> = _workoutUiState.asStateFlow()
 
     init {
+        if (bleRepository.isBleDeviceAlreadyConnected(deviceAddress)) {
+            bleRepository.disconnectFromDevice()
+        }
         connectToDevice()
-
         bleRepository.subscribeToConnectionState(
             deviceAddress = deviceAddress,
         ) { connectionState ->
@@ -68,13 +70,15 @@ class WorkoutScreenViewModel @Inject constructor(
 
     private fun saveSession() {
         viewModelScope.launch(Dispatchers.IO) {
-            val currentMachine = machine ?: return@launch
-            when (currentMachine) {
-                is Treadmill -> {
-                    Timber.tag(TAG).i("Saving treadmill session: $treadmillSession")
-                    sessionId = workoutRepository.insertTreadmillSession(treadmillSession)
+            machine?.let {
+                when (it) {
+                    is Treadmill -> {
+                        Timber.tag(TAG).i("Saving treadmill session: $treadmillSession")
+                        sessionId = workoutRepository.insertTreadmillSession(treadmillSession)
+                    }
                 }
             }
+
             _workoutUiState.update {
                 it.copy(
                     navigateToSummaryScreen = true

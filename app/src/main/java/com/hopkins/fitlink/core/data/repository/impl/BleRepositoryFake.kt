@@ -131,6 +131,10 @@ class BleRepositoryFake @Inject constructor() : BleRepository {
         return true
     }
 
+    override fun isBleDeviceAlreadyConnected(deviceAddress: String): Boolean {
+        return false
+    }
+
     override fun stopScanning() {
 
     }

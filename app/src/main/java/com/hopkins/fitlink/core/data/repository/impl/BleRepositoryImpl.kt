@@ -77,7 +77,7 @@ class BleRepositoryImpl @Inject constructor(
         stopScanning()
 
         val connection = activeConnection ?: run {
-            Timber.tag(TAG).e("No active BLE connection")
+            Timber.tag(TAG).e("No active BLE connection, not subscribing to characteristic with uuid: $characteristic")
             return
         }
 
@@ -171,7 +171,7 @@ class BleRepositoryImpl @Inject constructor(
         onFinished: () -> Unit,
     ) {
         val connection = activeConnection ?: run {
-            Timber.tag(TAG).e("No active BLE connection")
+            Timber.tag(TAG).e("No active BLE connection, ending discovery of characteristics.")
             return
         }
 
@@ -240,6 +240,11 @@ class BleRepositoryImpl @Inject constructor(
     override fun isBleEnabled(): Boolean {
         val state = rxBleClient.state
         return state != RxBleClient.State.BLUETOOTH_NOT_ENABLED
+    }
+
+    override fun isBleDeviceAlreadyConnected(deviceAddress: String): Boolean {
+        val device = rxBleClient.getBleDevice(deviceAddress)
+        return device.connectionState == RxBleConnection.RxBleConnectionState.CONNECTED
     }
 
     override fun stopScanning() {

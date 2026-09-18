@@ -94,6 +94,9 @@ fun Nav() {
                                 }
                             }
                         )
+                    },
+                    onGoBackToHome = {
+                        navController.popBackStack()
                     }
                 )
             }

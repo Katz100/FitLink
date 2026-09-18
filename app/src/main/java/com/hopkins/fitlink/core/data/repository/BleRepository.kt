@@ -64,6 +64,8 @@ interface BleRepository {
 
     fun isBleEnabled(): Boolean
 
+    fun isBleDeviceAlreadyConnected(deviceAddress: String): Boolean
+
     fun stopScanning()
 }
 
