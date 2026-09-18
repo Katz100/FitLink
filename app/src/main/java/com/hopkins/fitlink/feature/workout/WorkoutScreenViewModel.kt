@@ -49,6 +49,7 @@ class WorkoutScreenViewModel @Inject constructor(
 
     init {
         if (bleRepository.isBleDeviceAlreadyConnected(deviceAddress)) {
+            Timber.tag(TAG).i("Already connected to device with address: $deviceAddress")
             bleRepository.disconnectFromDevice()
         }
         connectToDevice()

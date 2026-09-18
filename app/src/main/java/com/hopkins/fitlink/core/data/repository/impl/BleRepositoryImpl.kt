@@ -244,7 +244,9 @@ class BleRepositoryImpl @Inject constructor(
 
     override fun isBleDeviceAlreadyConnected(deviceAddress: String): Boolean {
         val device = rxBleClient.getBleDevice(deviceAddress)
-        return device.connectionState == RxBleConnection.RxBleConnectionState.CONNECTED
+        Timber.tag(TAG).i("Device connection state: ${device.connectionState}")
+        return device.connectionState == RxBleConnection.RxBleConnectionState.CONNECTED ||
+                device.connectionState == RxBleConnection.RxBleConnectionState.CONNECTING
     }
 
     override fun stopScanning() {
