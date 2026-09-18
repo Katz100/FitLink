@@ -106,7 +106,8 @@ private fun MetricSummaryCard(
         colors = cardColor
     ) {
         MetricSummary(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth()
+                .padding(8.dp),
             heading = heading,
             value = value,
             unit = unit,
